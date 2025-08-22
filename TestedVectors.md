@@ -28,3 +28,8 @@
 | Vector | Severity | Status | Notes |
 | ------ | -------- | ------ | ----- |
 | Using zero address as receiver in swapTokensGeneric | Medium | Mitigated | Reverts with InvalidReceiver; covered by test |
+
+## TokenWrapper deposit ignores failed transfer
+- Severity: Medium
+- Test: `forge test --match-test testDepositFailsSilentlyOnFalseReturn`
+- Result: `deposit` deducts ETH but returns no wrapped tokens when underlying `transfer` returns false; tokens remain stuck in the contract.
