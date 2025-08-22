@@ -1,23 +1,24 @@
 // SPDX-License-Identifier: Unlicense
 pragma solidity ^0.8.17;
 
-import { IERC20 } from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
-import { SafeERC20 } from "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
-import { IVelodromeV2Pool } from "lifi/Interfaces/IVelodromeV2Pool.sol";
-import { IVelodromeV2PoolCallee } from "lifi/Interfaces/IVelodromeV2PoolCallee.sol";
-import { IVelodromeV2PoolFactory } from "lifi/Interfaces/IVelodromeV2PoolFactory.sol";
-import { IVelodromeV2Router } from "lifi/Interfaces/IVelodromeV2Router.sol";
-import { IAlgebraPool } from "lifi/Interfaces/IAlgebraPool.sol";
-import { IAlgebraRouter } from "lifi/Interfaces/IAlgebraRouter.sol";
-import { IAlgebraFactory } from "lifi/Interfaces/IAlgebraFactory.sol";
-import { IAlgebraQuoter } from "lifi/Interfaces/IAlgebraQuoter.sol";
-import { IHyperswapV3Factory } from "lifi/Interfaces/IHyperswapV3Factory.sol";
-import { IHyperswapV3QuoterV2 } from "lifi/Interfaces/IHyperswapV3QuoterV2.sol";
-import { LiFiDEXAggregator } from "lifi/Periphery/LiFiDEXAggregator.sol";
-import { InvalidConfig, InvalidCallData } from "lifi/Errors/GenericErrors.sol";
-import { TestBase } from "../utils/TestBase.sol";
-import { TestToken as ERC20 } from "../utils/TestToken.sol";
-import { MockFeeOnTransferToken } from "../utils/MockTokenFeeOnTransfer.sol";
+import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
+import {SafeERC20} from "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
+import {IVelodromeV2Pool} from "lifi/Interfaces/IVelodromeV2Pool.sol";
+import {IVelodromeV2PoolCallee} from "lifi/Interfaces/IVelodromeV2PoolCallee.sol";
+import {IVelodromeV2PoolFactory} from "lifi/Interfaces/IVelodromeV2PoolFactory.sol";
+import {IVelodromeV2Router} from "lifi/Interfaces/IVelodromeV2Router.sol";
+import {IAlgebraPool} from "lifi/Interfaces/IAlgebraPool.sol";
+import {IAlgebraRouter} from "lifi/Interfaces/IAlgebraRouter.sol";
+import {IAlgebraFactory} from "lifi/Interfaces/IAlgebraFactory.sol";
+import {IAlgebraQuoter} from "lifi/Interfaces/IAlgebraQuoter.sol";
+import {IHyperswapV3Factory} from "lifi/Interfaces/IHyperswapV3Factory.sol";
+import {IHyperswapV3QuoterV2} from "lifi/Interfaces/IHyperswapV3QuoterV2.sol";
+import {LiFiDEXAggregator} from "lifi/Periphery/LiFiDEXAggregator.sol";
+import {InvalidConfig, InvalidCallData} from "lifi/Errors/GenericErrors.sol";
+import {TestBase} from "../utils/TestBase.sol";
+import {TestToken as ERC20} from "../utils/TestToken.sol";
+import {MockFeeOnTransferToken} from "../utils/MockTokenFeeOnTransfer.sol";
+import {Test} from "forge-std/Test.sol";
 
 // Command codes for route processing
 enum CommandType {
@@ -28,6 +29,7 @@ enum CommandType {
     ProcessOnePool, // 4 - processOnePool
     ProcessInsideBento, // 5 - processInsideBento
     ApplyPermit // 6 - applyPermit
+
 }
 
 // Pool type identifiers
@@ -42,37 +44,30 @@ enum PoolType {
     Algebra, // 7
     iZiSwap, // 8
     SyncSwapV2 // 9
+
 }
 
 // Direction constants
 enum SwapDirection {
     Token1ToToken0, // 0
     Token0ToToken1 // 1
+
 }
 
 // Callback constants
 enum CallbackStatus {
     Disabled, // 0
     Enabled // 1
+
 }
 
 // Other constants
 uint16 constant FULL_SHARE = 65535; // 100% share for single pool swaps
 
 contract MockVelodromeV2FlashLoanCallbackReceiver is IVelodromeV2PoolCallee {
-    event HookCalled(
-        address sender,
-        uint256 amount0,
-        uint256 amount1,
-        bytes data
-    );
+    event HookCalled(address sender, uint256 amount0, uint256 amount1, bytes data);
 
-    function hook(
-        address sender,
-        uint256 amount0,
-        uint256 amount1,
-        bytes calldata data
-    ) external {
+    function hook(address sender, uint256 amount0, uint256 amount1, bytes calldata data) external {
         emit HookCalled(sender, amount0, amount1, data);
     }
 }
@@ -80,6 +75,7 @@ contract MockVelodromeV2FlashLoanCallbackReceiver is IVelodromeV2PoolCallee {
  * @title LiFiDexAggregatorTest
  * @notice Base test contract with common functionality and abstractions for DEX-specific tests
  */
+
 abstract contract LiFiDexAggregatorTest is TestBase {
     using SafeERC20 for IERC20;
 
@@ -97,12 +93,7 @@ abstract contract LiFiDexAggregatorTest is TestBase {
         uint256 amountOutMin,
         uint256 amountOut
     );
-    event HookCalled(
-        address sender,
-        uint256 amount0,
-        uint256 amount1,
-        bytes data
-    );
+    event HookCalled(address sender, uint256 amount0, uint256 amount1, bytes data);
 
     error WrongPoolReserves();
     error PoolDoesNotExist();
@@ -112,11 +103,7 @@ abstract contract LiFiDexAggregatorTest is TestBase {
         privileged = new address[](1);
         privileged[0] = owner;
 
-        liFiDEXAggregator = new LiFiDEXAggregator(
-            address(0xCAFE),
-            privileged,
-            owner
-        );
+        liFiDEXAggregator = new LiFiDEXAggregator(address(0xCAFE), privileged, owner);
         vm.label(address(liFiDEXAggregator), "LiFiDEXAggregator");
     }
 
@@ -146,21 +133,14 @@ abstract contract LiFiDexAggregatorTest is TestBase {
 
     function test_ContractIsSetUpCorrectly() public {
         assertEq(address(liFiDEXAggregator.BENTO_BOX()), address(0xCAFE));
-        assertEq(
-            liFiDEXAggregator.priviledgedUsers(address(USER_DIAMOND_OWNER)),
-            true
-        );
+        assertEq(liFiDEXAggregator.priviledgedUsers(address(USER_DIAMOND_OWNER)), true);
         assertEq(liFiDEXAggregator.owner(), USER_DIAMOND_OWNER);
     }
 
     function testRevert_FailsIfOwnerIsZeroAddress() public {
         vm.expectRevert(InvalidConfig.selector);
 
-        liFiDEXAggregator = new LiFiDEXAggregator(
-            address(0xCAFE),
-            privileged,
-            address(0)
-        );
+        liFiDEXAggregator = new LiFiDEXAggregator(address(0xCAFE), privileged, address(0));
     }
 
     // ============================ Abstract DEX Tests ============================
@@ -203,15 +183,11 @@ contract LiFiDexAggregatorVelodromeV2Test is LiFiDexAggregatorTest {
     // ==================== Velodrome V2 specific variables ====================
     IVelodromeV2Router internal constant VELODROME_V2_ROUTER =
         IVelodromeV2Router(0xa062aE8A9c5e11aaA026fc2670B0D65cCc8B2858); // optimism router
-    address internal constant VELODROME_V2_FACTORY_REGISTRY =
-        0xF1046053aa5682b4F9a81b5481394DA16BE5FF5a;
-    IERC20 internal constant STG_TOKEN =
-        IERC20(0x296F55F8Fb28E498B858d0BcDA06D955B2Cb3f97);
-    IERC20 internal constant USDC_E_TOKEN =
-        IERC20(0x7F5c764cBc14f9669B88837ca1490cCa17c31607);
+    address internal constant VELODROME_V2_FACTORY_REGISTRY = 0xF1046053aa5682b4F9a81b5481394DA16BE5FF5a;
+    IERC20 internal constant STG_TOKEN = IERC20(0x296F55F8Fb28E498B858d0BcDA06D955B2Cb3f97);
+    IERC20 internal constant USDC_E_TOKEN = IERC20(0x7F5c764cBc14f9669B88837ca1490cCa17c31607);
 
-    MockVelodromeV2FlashLoanCallbackReceiver
-        internal mockFlashloanCallbackReceiver;
+    MockVelodromeV2FlashLoanCallbackReceiver internal mockFlashloanCallbackReceiver;
 
     // Velodrome V2 structs
     struct VelodromeV2SwapTestParams {
@@ -347,9 +323,7 @@ contract LiFiDexAggregatorVelodromeV2Test is LiFiDexAggregatorTest {
                 from: address(liFiDEXAggregator),
                 to: address(USER_SENDER),
                 tokenIn: ADDRESS_USDC,
-                amountIn: IERC20(ADDRESS_USDC).balanceOf(
-                    address(liFiDEXAggregator)
-                ) - 1, // adjust for slot undrain protection: subtract 1 token so that the aggregator's balance isn't completely drained, matching the contract's safeguard
+                amountIn: IERC20(ADDRESS_USDC).balanceOf(address(liFiDEXAggregator)) - 1, // adjust for slot undrain protection: subtract 1 token so that the aggregator's balance isn't completely drained, matching the contract's safeguard
                 tokenOut: address(USDC_E_TOKEN),
                 stable: false,
                 direction: SwapDirection.Token0ToToken1,
@@ -383,33 +357,16 @@ contract LiFiDexAggregatorVelodromeV2Test is LiFiDexAggregatorTest {
         vm.startPrank(USER_SENDER);
 
         // Setup routes and get amounts
-        MultiHopTestParams memory params = _setupRoutes(
-            ADDRESS_USDC,
-            address(STG_TOKEN),
-            address(USDC_E_TOKEN),
-            false,
-            false
-        );
+        MultiHopTestParams memory params =
+            _setupRoutes(ADDRESS_USDC, address(STG_TOKEN), address(USDC_E_TOKEN), false, false);
 
         // Get initial reserves BEFORE the swap
         ReserveState memory initialReserves;
-        (
-            initialReserves.reserve0Pool1,
-            initialReserves.reserve1Pool1,
+        (initialReserves.reserve0Pool1, initialReserves.reserve1Pool1,) = IVelodromeV2Pool(params.pool1).getReserves();
+        (initialReserves.reserve0Pool2, initialReserves.reserve1Pool2,) = IVelodromeV2Pool(params.pool2).getReserves();
 
-        ) = IVelodromeV2Pool(params.pool1).getReserves();
-        (
-            initialReserves.reserve0Pool2,
-            initialReserves.reserve1Pool2,
-
-        ) = IVelodromeV2Pool(params.pool2).getReserves();
-
-        uint256 initialBalance1 = IERC20(params.tokenIn).balanceOf(
-            USER_SENDER
-        );
-        uint256 initialBalance2 = IERC20(params.tokenOut).balanceOf(
-            USER_SENDER
-        );
+        uint256 initialBalance1 = IERC20(params.tokenIn).balanceOf(USER_SENDER);
+        uint256 initialBalance2 = IERC20(params.tokenOut).balanceOf(USER_SENDER);
 
         // Build route and execute swap
         bytes memory route = _buildMultiHopRoute(params, USER_SENDER, 1, 1);
@@ -429,12 +386,7 @@ contract LiFiDexAggregatorVelodromeV2Test is LiFiDexAggregatorTest {
         );
 
         liFiDEXAggregator.processRoute(
-            params.tokenIn,
-            1000 * 1e6,
-            params.tokenOut,
-            params.amounts2[1],
-            USER_SENDER,
-            route
+            params.tokenIn, 1000 * 1e6, params.tokenOut, params.amounts2[1], USER_SENDER, route
         );
 
         _verifyUserBalances(params, initialBalance1, initialBalance2);
@@ -457,24 +409,12 @@ contract LiFiDexAggregatorVelodromeV2Test is LiFiDexAggregatorTest {
 
         // Get initial reserves BEFORE the swap
         ReserveState memory initialReserves;
-        (
-            initialReserves.reserve0Pool1,
-            initialReserves.reserve1Pool1,
-
-        ) = IVelodromeV2Pool(params.pool1).getReserves();
-        (
-            initialReserves.reserve0Pool2,
-            initialReserves.reserve1Pool2,
-
-        ) = IVelodromeV2Pool(params.pool2).getReserves();
+        (initialReserves.reserve0Pool1, initialReserves.reserve1Pool1,) = IVelodromeV2Pool(params.pool1).getReserves();
+        (initialReserves.reserve0Pool2, initialReserves.reserve1Pool2,) = IVelodromeV2Pool(params.pool2).getReserves();
 
         // Record initial balances
-        uint256 initialBalance1 = IERC20(params.tokenIn).balanceOf(
-            USER_SENDER
-        );
-        uint256 initialBalance2 = IERC20(params.tokenOut).balanceOf(
-            USER_SENDER
-        );
+        uint256 initialBalance1 = IERC20(params.tokenIn).balanceOf(USER_SENDER);
+        uint256 initialBalance2 = IERC20(params.tokenOut).balanceOf(USER_SENDER);
 
         // Build route and execute swap
         bytes memory route = _buildMultiHopRoute(params, USER_SENDER, 1, 0);
@@ -494,12 +434,7 @@ contract LiFiDexAggregatorVelodromeV2Test is LiFiDexAggregatorTest {
         );
 
         liFiDEXAggregator.processRoute(
-            params.tokenIn,
-            1000 * 1e6,
-            params.tokenOut,
-            params.amounts2[1],
-            USER_SENDER,
-            route
+            params.tokenIn, 1000 * 1e6, params.tokenOut, params.amounts2[1], USER_SENDER, route
         );
 
         _verifyUserBalances(params, initialBalance1, initialBalance2);
@@ -512,12 +447,8 @@ contract LiFiDexAggregatorVelodromeV2Test is LiFiDexAggregatorTest {
         vm.startPrank(USER_SENDER);
 
         // Get a valid pool address first for comparison
-        address validPool = VELODROME_V2_ROUTER.poolFor(
-            ADDRESS_USDC,
-            address(STG_TOKEN),
-            false,
-            VELODROME_V2_FACTORY_REGISTRY
-        );
+        address validPool =
+            VELODROME_V2_ROUTER.poolFor(ADDRESS_USDC, address(STG_TOKEN), false, VELODROME_V2_FACTORY_REGISTRY);
 
         // Test case 1: Zero pool address
         bytes memory routeWithZeroPool = abi.encodePacked(
@@ -535,14 +466,7 @@ contract LiFiDexAggregatorVelodromeV2Test is LiFiDexAggregatorTest {
         IERC20(ADDRESS_USDC).approve(address(liFiDEXAggregator), 1000 * 1e6);
 
         vm.expectRevert(InvalidCallData.selector);
-        liFiDEXAggregator.processRoute(
-            ADDRESS_USDC,
-            1000 * 1e6,
-            address(STG_TOKEN),
-            0,
-            USER_SENDER,
-            routeWithZeroPool
-        );
+        liFiDEXAggregator.processRoute(ADDRESS_USDC, 1000 * 1e6, address(STG_TOKEN), 0, USER_SENDER, routeWithZeroPool);
 
         // Test case 2: Zero recipient address
         bytes memory routeWithZeroRecipient = abi.encodePacked(
@@ -559,12 +483,7 @@ contract LiFiDexAggregatorVelodromeV2Test is LiFiDexAggregatorTest {
 
         vm.expectRevert(InvalidCallData.selector);
         liFiDEXAggregator.processRoute(
-            ADDRESS_USDC,
-            1000 * 1e6,
-            address(STG_TOKEN),
-            0,
-            USER_SENDER,
-            routeWithZeroRecipient
+            ADDRESS_USDC, 1000 * 1e6, address(STG_TOKEN), 0, USER_SENDER, routeWithZeroRecipient
         );
 
         vm.stopPrank();
@@ -574,13 +493,8 @@ contract LiFiDexAggregatorVelodromeV2Test is LiFiDexAggregatorTest {
         vm.startPrank(USER_SENDER);
 
         // Setup multi-hop route: USDC -> STG -> USDC.e
-        MultiHopTestParams memory params = _setupRoutes(
-            ADDRESS_USDC,
-            address(STG_TOKEN),
-            address(USDC_E_TOKEN),
-            false,
-            false
-        );
+        MultiHopTestParams memory params =
+            _setupRoutes(ADDRESS_USDC, address(STG_TOKEN), address(USDC_E_TOKEN), false, false);
 
         // Build multi-hop route
         bytes memory firstHop = _buildFirstHop(
@@ -612,14 +526,7 @@ contract LiFiDexAggregatorVelodromeV2Test is LiFiDexAggregatorTest {
 
         vm.expectRevert(WrongPoolReserves.selector);
 
-        liFiDEXAggregator.processRoute(
-            ADDRESS_USDC,
-            1000 * 1e6,
-            address(USDC_E_TOKEN),
-            0,
-            USER_SENDER,
-            route
-        );
+        liFiDEXAggregator.processRoute(ADDRESS_USDC, 1000 * 1e6, address(USDC_E_TOKEN), 0, USER_SENDER, route);
 
         vm.stopPrank();
         vm.clearMockedCalls();
@@ -633,33 +540,24 @@ contract LiFiDexAggregatorVelodromeV2Test is LiFiDexAggregatorTest {
      */
     function _testSwap(VelodromeV2SwapTestParams memory params) internal {
         // get expected output amounts from the router.
-        IVelodromeV2Router.Route[]
-            memory routes = new IVelodromeV2Router.Route[](1);
+        IVelodromeV2Router.Route[] memory routes = new IVelodromeV2Router.Route[](1);
         routes[0] = IVelodromeV2Router.Route({
             from: params.tokenIn,
             to: params.tokenOut,
             stable: params.stable,
             factory: address(VELODROME_V2_FACTORY_REGISTRY)
         });
-        uint256[] memory amounts = VELODROME_V2_ROUTER.getAmountsOut(
-            params.amountIn,
-            routes
-        );
+        uint256[] memory amounts = VELODROME_V2_ROUTER.getAmountsOut(params.amountIn, routes);
         emit log_named_uint("Expected amount out", amounts[1]);
 
         // Retrieve the pool address.
-        address pool = VELODROME_V2_ROUTER.poolFor(
-            params.tokenIn,
-            params.tokenOut,
-            params.stable,
-            VELODROME_V2_FACTORY_REGISTRY
-        );
+        address pool =
+            VELODROME_V2_ROUTER.poolFor(params.tokenIn, params.tokenOut, params.stable, VELODROME_V2_FACTORY_REGISTRY);
         emit log_named_uint("Pool address:", uint256(uint160(pool)));
 
         // if tokens come from the aggregator (address(liFiDEXAggregator)), use command code 1; otherwise, use 2.
-        CommandType commandCode = params.from == address(liFiDEXAggregator)
-            ? CommandType.ProcessMyERC20
-            : CommandType.ProcessUserERC20;
+        CommandType commandCode =
+            params.from == address(liFiDEXAggregator) ? CommandType.ProcessMyERC20 : CommandType.ProcessUserERC20;
 
         // build the route.
         bytes memory route = abi.encodePacked(
@@ -671,62 +569,32 @@ contract LiFiDexAggregatorVelodromeV2Test is LiFiDexAggregatorTest {
             pool,
             params.direction,
             params.to,
-            params.callback
-                ? uint8(CallbackStatus.Enabled)
-                : uint8(CallbackStatus.Disabled)
+            params.callback ? uint8(CallbackStatus.Enabled) : uint8(CallbackStatus.Disabled)
         );
 
         // approve the aggregator to spend tokenIn.
-        IERC20(params.tokenIn).approve(
-            address(liFiDEXAggregator),
-            params.amountIn
-        );
+        IERC20(params.tokenIn).approve(address(liFiDEXAggregator), params.amountIn);
 
         // capture initial token balances.
         uint256 initialTokenIn = IERC20(params.tokenIn).balanceOf(params.from);
         uint256 initialTokenOut = IERC20(params.tokenOut).balanceOf(params.to);
         emit log_named_uint("Initial tokenIn balance", initialTokenIn);
 
-        address from = params.from == address(liFiDEXAggregator)
-            ? USER_SENDER
-            : params.from;
+        address from = params.from == address(liFiDEXAggregator) ? USER_SENDER : params.from;
         if (params.callback == true) {
             vm.expectEmit(true, false, false, false);
-            emit HookCalled(
-                address(liFiDEXAggregator),
-                0,
-                0,
-                abi.encode(params.tokenIn)
-            );
+            emit HookCalled(address(liFiDEXAggregator), 0, 0, abi.encode(params.tokenIn));
         }
         vm.expectEmit(true, true, true, true);
-        emit Route(
-            from,
-            params.to,
-            params.tokenIn,
-            params.tokenOut,
-            params.amountIn,
-            amounts[1],
-            amounts[1]
-        );
+        emit Route(from, params.to, params.tokenIn, params.tokenOut, params.amountIn, amounts[1], amounts[1]);
 
         // execute the swap
-        liFiDEXAggregator.processRoute(
-            params.tokenIn,
-            params.amountIn,
-            params.tokenOut,
-            amounts[1],
-            params.to,
-            route
-        );
+        liFiDEXAggregator.processRoute(params.tokenIn, params.amountIn, params.tokenOut, amounts[1], params.to, route);
 
         uint256 finalTokenIn = IERC20(params.tokenIn).balanceOf(params.from);
         uint256 finalTokenOut = IERC20(params.tokenOut).balanceOf(params.to);
         emit log_named_uint("TokenIn spent", initialTokenIn - finalTokenIn);
-        emit log_named_uint(
-            "TokenOut received",
-            finalTokenOut - initialTokenOut
-        );
+        emit log_named_uint("TokenOut received", finalTokenOut - initialTokenOut);
 
         assertApproxEqAbs(
             initialTokenIn - finalTokenIn,
@@ -734,117 +602,85 @@ contract LiFiDexAggregatorVelodromeV2Test is LiFiDexAggregatorTest {
             1, // 1 wei tolerance
             "TokenIn amount mismatch"
         );
-        assertEq(
-            finalTokenOut - initialTokenOut,
-            amounts[1],
-            "TokenOut amount mismatch"
-        );
+        assertEq(finalTokenOut - initialTokenOut, amounts[1], "TokenOut amount mismatch");
     }
 
     // Helper function to set up routes and get amounts
-    function _setupRoutes(
-        address tokenIn,
-        address tokenMid,
-        address tokenOut,
-        bool isStableFirst,
-        bool isStableSecond
-    ) private view returns (MultiHopTestParams memory params) {
+    function _setupRoutes(address tokenIn, address tokenMid, address tokenOut, bool isStableFirst, bool isStableSecond)
+        private
+        view
+        returns (MultiHopTestParams memory params)
+    {
         params.tokenIn = tokenIn;
         params.tokenMid = tokenMid;
         params.tokenOut = tokenOut;
 
         // Setup first hop route
-        IVelodromeV2Router.Route[]
-            memory routes1 = new IVelodromeV2Router.Route[](1);
+        IVelodromeV2Router.Route[] memory routes1 = new IVelodromeV2Router.Route[](1);
         routes1[0] = IVelodromeV2Router.Route({
             from: tokenIn,
             to: tokenMid,
             stable: isStableFirst,
             factory: address(VELODROME_V2_FACTORY_REGISTRY)
         });
-        params.amounts1 = VELODROME_V2_ROUTER.getAmountsOut(
-            1000 * 1e6,
-            routes1
-        );
+        params.amounts1 = VELODROME_V2_ROUTER.getAmountsOut(1000 * 1e6, routes1);
 
         // Setup second hop route
-        IVelodromeV2Router.Route[]
-            memory routes2 = new IVelodromeV2Router.Route[](1);
+        IVelodromeV2Router.Route[] memory routes2 = new IVelodromeV2Router.Route[](1);
         routes2[0] = IVelodromeV2Router.Route({
             from: tokenMid,
             to: tokenOut,
             stable: isStableSecond,
             factory: address(VELODROME_V2_FACTORY_REGISTRY)
         });
-        params.amounts2 = VELODROME_V2_ROUTER.getAmountsOut(
-            params.amounts1[1],
-            routes2
-        );
+        params.amounts2 = VELODROME_V2_ROUTER.getAmountsOut(params.amounts1[1], routes2);
 
         // Get pool addresses
-        params.pool1 = VELODROME_V2_ROUTER.poolFor(
-            tokenIn,
-            tokenMid,
-            isStableFirst,
-            VELODROME_V2_FACTORY_REGISTRY
-        );
+        params.pool1 = VELODROME_V2_ROUTER.poolFor(tokenIn, tokenMid, isStableFirst, VELODROME_V2_FACTORY_REGISTRY);
 
-        params.pool2 = VELODROME_V2_ROUTER.poolFor(
-            tokenMid,
-            tokenOut,
-            isStableSecond,
-            VELODROME_V2_FACTORY_REGISTRY
-        );
+        params.pool2 = VELODROME_V2_ROUTER.poolFor(tokenMid, tokenOut, isStableSecond, VELODROME_V2_FACTORY_REGISTRY);
 
         // Get pool fees info
-        params.pool1Fee = IVelodromeV2PoolFactory(
-            VELODROME_V2_FACTORY_REGISTRY
-        ).getFee(params.pool1, isStableFirst);
-        params.pool2Fee = IVelodromeV2PoolFactory(
-            VELODROME_V2_FACTORY_REGISTRY
-        ).getFee(params.pool2, isStableSecond);
+        params.pool1Fee = IVelodromeV2PoolFactory(VELODROME_V2_FACTORY_REGISTRY).getFee(params.pool1, isStableFirst);
+        params.pool2Fee = IVelodromeV2PoolFactory(VELODROME_V2_FACTORY_REGISTRY).getFee(params.pool2, isStableSecond);
 
         return params;
     }
 
     // function to build first hop of the route
-    function _buildFirstHop(
-        address tokenIn,
-        address pool1,
-        address pool2,
-        uint8 direction
-    ) private pure returns (bytes memory) {
-        return
-            abi.encodePacked(
-                uint8(CommandType.ProcessUserERC20),
-                tokenIn,
-                uint8(1),
-                FULL_SHARE,
-                uint8(PoolType.VelodromeV2),
-                pool1,
-                direction,
-                pool2,
-                uint8(CallbackStatus.Disabled)
-            );
+    function _buildFirstHop(address tokenIn, address pool1, address pool2, uint8 direction)
+        private
+        pure
+        returns (bytes memory)
+    {
+        return abi.encodePacked(
+            uint8(CommandType.ProcessUserERC20),
+            tokenIn,
+            uint8(1),
+            FULL_SHARE,
+            uint8(PoolType.VelodromeV2),
+            pool1,
+            direction,
+            pool2,
+            uint8(CallbackStatus.Disabled)
+        );
     }
 
     // function to build second hop of the route
-    function _buildSecondHop(
-        address tokenMid,
-        address pool2,
-        address recipient,
-        uint8 direction
-    ) private pure returns (bytes memory) {
-        return
-            abi.encodePacked(
-                uint8(CommandType.ProcessOnePool),
-                tokenMid,
-                uint8(PoolType.VelodromeV2),
-                pool2,
-                direction,
-                recipient,
-                uint8(CallbackStatus.Disabled)
-            );
+    function _buildSecondHop(address tokenMid, address pool2, address recipient, uint8 direction)
+        private
+        pure
+        returns (bytes memory)
+    {
+        return abi.encodePacked(
+            uint8(CommandType.ProcessOnePool),
+            tokenMid,
+            uint8(PoolType.VelodromeV2),
+            pool2,
+            direction,
+            recipient,
+            uint8(CallbackStatus.Disabled)
+        );
     }
 
     // route building function
@@ -854,28 +690,16 @@ contract LiFiDexAggregatorVelodromeV2Test is LiFiDexAggregatorTest {
         uint8 firstHopDirection,
         uint8 secondHopDirection
     ) private pure returns (bytes memory) {
-        bytes memory firstHop = _buildFirstHop(
-            params.tokenIn,
-            params.pool1,
-            params.pool2,
-            firstHopDirection
-        );
+        bytes memory firstHop = _buildFirstHop(params.tokenIn, params.pool1, params.pool2, firstHopDirection);
 
-        bytes memory secondHop = _buildSecondHop(
-            params.tokenMid,
-            params.pool2,
-            recipient,
-            secondHopDirection
-        );
+        bytes memory secondHop = _buildSecondHop(params.tokenMid, params.pool2, recipient, secondHopDirection);
 
         return bytes.concat(firstHop, secondHop);
     }
 
-    function _verifyUserBalances(
-        MultiHopTestParams memory params,
-        uint256 initialBalance1,
-        uint256 initialBalance2
-    ) private {
+    function _verifyUserBalances(MultiHopTestParams memory params, uint256 initialBalance1, uint256 initialBalance2)
+        private
+    {
         // Verify token balances
         uint256 finalBalance1 = IERC20(params.tokenIn).balanceOf(USER_SENDER);
         uint256 finalBalance2 = IERC20(params.tokenOut).balanceOf(USER_SENDER);
@@ -886,36 +710,19 @@ contract LiFiDexAggregatorVelodromeV2Test is LiFiDexAggregatorTest {
             1, // 1 wei tolerance
             "Token1 spent amount mismatch"
         );
-        assertEq(
-            finalBalance2 - initialBalance2,
-            params.amounts2[1],
-            "Token2 received amount mismatch"
-        );
+        assertEq(finalBalance2 - initialBalance2, params.amounts2[1], "Token2 received amount mismatch");
     }
 
-    function _verifyReserves(
-        MultiHopTestParams memory params,
-        ReserveState memory initialReserves
-    ) private {
+    function _verifyReserves(MultiHopTestParams memory params, ReserveState memory initialReserves) private {
         // Get reserves after swap
-        (
-            uint256 finalReserve0Pool1,
-            uint256 finalReserve1Pool1,
-
-        ) = IVelodromeV2Pool(params.pool1).getReserves();
-        (
-            uint256 finalReserve0Pool2,
-            uint256 finalReserve1Pool2,
-
-        ) = IVelodromeV2Pool(params.pool2).getReserves();
+        (uint256 finalReserve0Pool1, uint256 finalReserve1Pool1,) = IVelodromeV2Pool(params.pool1).getReserves();
+        (uint256 finalReserve0Pool2, uint256 finalReserve1Pool2,) = IVelodromeV2Pool(params.pool2).getReserves();
 
         address token0Pool1 = IVelodromeV2Pool(params.pool1).token0();
         address token0Pool2 = IVelodromeV2Pool(params.pool2).token0();
 
         // Calculate exact expected changes
-        uint256 amountInAfterFees = 1000 *
-            1e6 -
-            ((1000 * 1e6 * params.pool1Fee) / 10000);
+        uint256 amountInAfterFees = 1000 * 1e6 - ((1000 * 1e6 * params.pool1Fee) / 10000);
 
         // Assert exact reserve changes for Pool1
         if (token0Pool1 == params.tokenIn) {
@@ -949,8 +756,7 @@ contract LiFiDexAggregatorVelodromeV2Test is LiFiDexAggregatorTest {
             // tokenMid is token0, so reserve0 should increase and reserve1 should decrease
             assertEq(
                 finalReserve0Pool2 - initialReserves.reserve0Pool2,
-                params.amounts1[1] -
-                    ((params.amounts1[1] * params.pool2Fee) / 10000),
+                params.amounts1[1] - ((params.amounts1[1] * params.pool2Fee) / 10000),
                 "Pool2 reserve0 (tokenMid) change incorrect"
             );
             assertEq(
@@ -962,8 +768,7 @@ contract LiFiDexAggregatorVelodromeV2Test is LiFiDexAggregatorTest {
             // tokenMid is token1, so reserve1 should increase and reserve0 should decrease
             assertEq(
                 finalReserve1Pool2 - initialReserves.reserve1Pool2,
-                params.amounts1[1] -
-                    ((params.amounts1[1] * params.pool2Fee) / 10000),
+                params.amounts1[1] - ((params.amounts1[1] * params.pool2Fee) / 10000),
                 "Pool2 reserve1 (tokenMid) change incorrect"
             );
             assertEq(
@@ -984,12 +789,7 @@ contract AlgebraLiquidityAdderHelper {
         TOKEN_1 = _token1;
     }
 
-    function addLiquidity(
-        address pool,
-        int24 bottomTick,
-        int24 topTick,
-        uint128 amount
-    )
+    function addLiquidity(address pool, int24 bottomTick, int24 topTick, uint128 amount)
         external
         returns (uint256 amount0, uint256 amount1, uint128 liquidityActual)
     {
@@ -999,12 +799,7 @@ contract AlgebraLiquidityAdderHelper {
 
         // Call mint
         (amount0, amount1, liquidityActual) = IAlgebraPool(pool).mint(
-            address(this),
-            address(this),
-            bottomTick,
-            topTick,
-            amount,
-            abi.encode(TOKEN_0, TOKEN_1)
+            address(this), address(this), bottomTick, topTick, amount, abi.encode(TOKEN_0, TOKEN_1)
         );
 
         // Get balances after to account for fees
@@ -1018,42 +813,26 @@ contract AlgebraLiquidityAdderHelper {
         return (amount0, amount1, liquidityActual);
     }
 
-    function algebraMintCallback(
-        uint256 amount0Owed,
-        uint256 amount1Owed,
-        bytes calldata
-    ) external {
+    function algebraMintCallback(uint256 amount0Owed, uint256 amount1Owed, bytes calldata) external {
         // Check token balances
         uint256 balance0 = IERC20(TOKEN_0).balanceOf(address(this));
         uint256 balance1 = IERC20(TOKEN_1).balanceOf(address(this));
 
         // Transfer what we can, limited by actual balance
         if (amount0Owed > 0) {
-            uint256 amount0ToSend = amount0Owed > balance0
-                ? balance0
-                : amount0Owed;
-            uint256 balance0Before = IERC20(TOKEN_0).balanceOf(
-                address(msg.sender)
-            );
+            uint256 amount0ToSend = amount0Owed > balance0 ? balance0 : amount0Owed;
+            uint256 balance0Before = IERC20(TOKEN_0).balanceOf(address(msg.sender));
             IERC20(TOKEN_0).transfer(msg.sender, amount0ToSend);
-            uint256 balance0After = IERC20(TOKEN_0).balanceOf(
-                address(msg.sender)
-            );
+            uint256 balance0After = IERC20(TOKEN_0).balanceOf(address(msg.sender));
             // solhint-disable-next-line gas-custom-errors
             require(balance0After > balance0Before, "Transfer failed");
         }
 
         if (amount1Owed > 0) {
-            uint256 amount1ToSend = amount1Owed > balance1
-                ? balance1
-                : amount1Owed;
-            uint256 balance1Before = IERC20(TOKEN_1).balanceOf(
-                address(msg.sender)
-            );
+            uint256 amount1ToSend = amount1Owed > balance1 ? balance1 : amount1Owed;
+            uint256 balance1Before = IERC20(TOKEN_1).balanceOf(address(msg.sender));
             IERC20(TOKEN_1).transfer(msg.sender, amount1ToSend);
-            uint256 balance1After = IERC20(TOKEN_1).balanceOf(
-                address(msg.sender)
-            );
+            uint256 balance1After = IERC20(TOKEN_1).balanceOf(address(msg.sender));
             // solhint-disable-next-line gas-custom-errors
             require(balance1After > balance1Before, "Transfer failed");
         }
@@ -1065,21 +844,14 @@ contract AlgebraLiquidityAdderHelper {
  * @notice Tests specific to Algebra pool type
  */
 contract LiFiDexAggregatorAlgebraTest is LiFiDexAggregatorTest {
-    address private constant APE_ETH_TOKEN =
-        0xcF800F4948D16F23333508191B1B1591daF70438;
-    address private constant WETH_TOKEN =
-        0xf4D9235269a96aaDaFc9aDAe454a0618eBE37949;
-    address private constant ALGEBRA_FACTORY_APECHAIN =
-        0x10aA510d94E094Bd643677bd2964c3EE085Daffc;
-    address private constant ALGEBRA_QUOTER_V2_APECHAIN =
-        0x60A186019F81bFD04aFc16c9C01804a04E79e68B;
-    address private constant ALGEBRA_POOL_APECHAIN =
-        0x217076aa74eFF7D54837D00296e9AEBc8c06d4F2;
-    address private constant APE_ETH_HOLDER_APECHAIN =
-        address(0x1EA5Df273F1b2e0b10554C8F6f7Cc7Ef34F6a51b);
+    address private constant APE_ETH_TOKEN = 0xcF800F4948D16F23333508191B1B1591daF70438;
+    address private constant WETH_TOKEN = 0xf4D9235269a96aaDaFc9aDAe454a0618eBE37949;
+    address private constant ALGEBRA_FACTORY_APECHAIN = 0x10aA510d94E094Bd643677bd2964c3EE085Daffc;
+    address private constant ALGEBRA_QUOTER_V2_APECHAIN = 0x60A186019F81bFD04aFc16c9C01804a04E79e68B;
+    address private constant ALGEBRA_POOL_APECHAIN = 0x217076aa74eFF7D54837D00296e9AEBc8c06d4F2;
+    address private constant APE_ETH_HOLDER_APECHAIN = address(0x1EA5Df273F1b2e0b10554C8F6f7Cc7Ef34F6a51b);
 
-    address private constant IMPOSSIBLE_POOL_ADDRESS =
-        0x0000000000000000000000000000000000000001;
+    address private constant IMPOSSIBLE_POOL_ADDRESS = 0x0000000000000000000000000000000000000001;
 
     struct AlgebraSwapTestParams {
         address from;
@@ -1110,9 +882,7 @@ contract LiFiDexAggregatorAlgebraTest is LiFiDexAggregatorTest {
                 from: address(liFiDEXAggregator),
                 to: address(USER_SENDER),
                 tokenIn: APE_ETH_TOKEN,
-                amountIn: IERC20(APE_ETH_TOKEN).balanceOf(
-                    address(liFiDEXAggregator)
-                ) - 1,
+                amountIn: IERC20(APE_ETH_TOKEN).balanceOf(address(liFiDEXAggregator)) - 1,
                 tokenOut: address(WETH_TOKEN),
                 direction: SwapDirection.Token0ToToken1,
                 supportsFeeOnTransfer: true
@@ -1145,9 +915,7 @@ contract LiFiDexAggregatorAlgebraTest is LiFiDexAggregatorTest {
         );
 
         // Track initial balance
-        uint256 beforeBalance = IERC20(WETH_TOKEN).balanceOf(
-            APE_ETH_HOLDER_APECHAIN
-        );
+        uint256 beforeBalance = IERC20(WETH_TOKEN).balanceOf(APE_ETH_HOLDER_APECHAIN);
 
         // Execute the swap
         liFiDEXAggregator.processRoute(
@@ -1160,9 +928,7 @@ contract LiFiDexAggregatorAlgebraTest is LiFiDexAggregatorTest {
         );
 
         // Verify balances
-        uint256 afterBalance = IERC20(WETH_TOKEN).balanceOf(
-            APE_ETH_HOLDER_APECHAIN
-        );
+        uint256 afterBalance = IERC20(WETH_TOKEN).balanceOf(APE_ETH_HOLDER_APECHAIN);
         assertGt(afterBalance - beforeBalance, 0, "Should receive some WETH");
 
         vm.stopPrank();
@@ -1248,11 +1014,7 @@ contract LiFiDexAggregatorAlgebraTest is LiFiDexAggregatorTest {
         address invalidPool = address(0x999);
 
         // Mock token0() call on invalid pool
-        vm.mockCall(
-            invalidPool,
-            abi.encodeWithSelector(IAlgebraPool.token0.selector),
-            abi.encode(APE_ETH_TOKEN)
-        );
+        vm.mockCall(invalidPool, abi.encodeWithSelector(IAlgebraPool.token0.selector), abi.encode(APE_ETH_TOKEN));
 
         // Create a route with an invalid pool
         bytes memory invalidRoute = _buildAlgebraRoute(
@@ -1270,52 +1032,27 @@ contract LiFiDexAggregatorAlgebraTest is LiFiDexAggregatorTest {
 
         // Mock the algebra pool to not reset lastCalledPool
         vm.mockCall(
-            invalidPool,
-            abi.encodeWithSelector(
-                IAlgebraPool.swapSupportingFeeOnInputTokens.selector
-            ),
-            abi.encode(0, 0)
+            invalidPool, abi.encodeWithSelector(IAlgebraPool.swapSupportingFeeOnInputTokens.selector), abi.encode(0, 0)
         );
 
         // Expect the AlgebraSwapUnexpected error
         vm.expectRevert(AlgebraSwapUnexpected.selector);
 
-        liFiDEXAggregator.processRoute(
-            APE_ETH_TOKEN,
-            1 * 1e18,
-            address(WETH_TOKEN),
-            0,
-            USER_SENDER,
-            invalidRoute
-        );
+        liFiDEXAggregator.processRoute(APE_ETH_TOKEN, 1 * 1e18, address(WETH_TOKEN), 0, USER_SENDER, invalidRoute);
 
         vm.stopPrank();
         vm.clearMockedCalls();
     }
 
     // Helper function to setup tokens and pools
-    function _setupTokensAndPools(
-        MultiHopTestState memory state
-    ) private returns (MultiHopTestState memory) {
+    function _setupTokensAndPools(MultiHopTestState memory state) private returns (MultiHopTestState memory) {
         // Create tokens
-        ERC20 tokenA = new ERC20(
-            "Token A",
-            state.isFeeOnTransfer ? "FTA" : "TA",
-            18
-        );
+        ERC20 tokenA = new ERC20("Token A", state.isFeeOnTransfer ? "FTA" : "TA", 18);
         IERC20 tokenB;
-        ERC20 tokenC = new ERC20(
-            "Token C",
-            state.isFeeOnTransfer ? "FTC" : "TC",
-            18
-        );
+        ERC20 tokenC = new ERC20("Token C", state.isFeeOnTransfer ? "FTC" : "TC", 18);
 
         if (state.isFeeOnTransfer) {
-            tokenB = IERC20(
-                address(
-                    new MockFeeOnTransferToken("Fee Token B", "FTB", 18, 300)
-                )
-            );
+            tokenB = IERC20(address(new MockFeeOnTransferToken("Fee Token B", "FTB", 18, 300)));
         } else {
             tokenB = IERC20(address(new ERC20("Token B", "TB", 18)));
         }
@@ -1334,68 +1071,39 @@ contract LiFiDexAggregatorAlgebraTest is LiFiDexAggregatorTest {
         if (!state.isFeeOnTransfer) {
             ERC20(address(tokenB)).mint(address(this), 1_000_000 * 1e18);
         } else {
-            MockFeeOnTransferToken(address(tokenB)).mint(
-                address(this),
-                1_000_000 * 1e18
-            );
+            MockFeeOnTransferToken(address(tokenB)).mint(address(this), 1_000_000 * 1e18);
         }
         tokenC.mint(address(this), 1_000_000 * 1e18);
 
         // Create pools
-        state.pool1 = _createAlgebraPool(
-            address(state.tokenA),
-            address(state.tokenB)
-        );
-        state.pool2 = _createAlgebraPool(
-            address(state.tokenB),
-            address(state.tokenC)
-        );
+        state.pool1 = _createAlgebraPool(address(state.tokenA), address(state.tokenB));
+        state.pool2 = _createAlgebraPool(address(state.tokenB), address(state.tokenC));
 
         vm.label(state.pool1, "Pool 1");
         vm.label(state.pool2, "Pool 2");
 
         // Add liquidity
-        _addLiquidityToPool(
-            state.pool1,
-            address(state.tokenA),
-            address(state.tokenB)
-        );
-        _addLiquidityToPool(
-            state.pool2,
-            address(state.tokenB),
-            address(state.tokenC)
-        );
+        _addLiquidityToPool(state.pool1, address(state.tokenA), address(state.tokenB));
+        _addLiquidityToPool(state.pool2, address(state.tokenB), address(state.tokenC));
 
         state.amountToTransfer = 100 * 1e18;
         state.amountIn = 50 * 1e18;
 
         // Transfer tokens to USER_SENDER
-        IERC20(address(state.tokenA)).transfer(
-            USER_SENDER,
-            state.amountToTransfer
-        );
+        IERC20(address(state.tokenA)).transfer(USER_SENDER, state.amountToTransfer);
 
         return state;
     }
 
     // Helper function to execute and verify the swap
-    function _executeAndVerifyMultiHopSwap(
-        MultiHopTestState memory state
-    ) private {
+    function _executeAndVerifyMultiHopSwap(MultiHopTestState memory state) private {
         vm.startPrank(USER_SENDER);
 
-        uint256 initialBalanceA = IERC20(address(state.tokenA)).balanceOf(
-            USER_SENDER
-        );
-        uint256 initialBalanceC = IERC20(address(state.tokenC)).balanceOf(
-            USER_SENDER
-        );
+        uint256 initialBalanceA = IERC20(address(state.tokenA)).balanceOf(USER_SENDER);
+        uint256 initialBalanceC = IERC20(address(state.tokenC)).balanceOf(USER_SENDER);
 
         // Approve spending
-        IERC20(address(state.tokenA)).approve(
-            address(liFiDEXAggregator),
-            state.amountIn
-        );
+        IERC20(address(state.tokenA)).approve(address(liFiDEXAggregator), state.amountIn);
 
         // Build route
         bytes memory route = _buildMultiHopRouteForTest(state);
@@ -1417,9 +1125,7 @@ contract LiFiDexAggregatorAlgebraTest is LiFiDexAggregatorTest {
     }
 
     // Helper function to build the multi-hop route for test
-    function _buildMultiHopRouteForTest(
-        MultiHopTestState memory state
-    ) private view returns (bytes memory) {
+    function _buildMultiHopRouteForTest(MultiHopTestState memory state) private view returns (bytes memory) {
         bytes memory firstHop = _buildAlgebraRoute(
             AlgebraRouteParams({
                 commandCode: CommandType.ProcessUserERC20,
@@ -1444,17 +1150,11 @@ contract LiFiDexAggregatorAlgebraTest is LiFiDexAggregatorTest {
     }
 
     // Helper function to verify multi-hop results
-    function _verifyMultiHopResults(
-        MultiHopTestState memory state,
-        uint256 initialBalanceA,
-        uint256 initialBalanceC
-    ) private {
-        uint256 finalBalanceA = IERC20(address(state.tokenA)).balanceOf(
-            USER_SENDER
-        );
-        uint256 finalBalanceC = IERC20(address(state.tokenC)).balanceOf(
-            USER_SENDER
-        );
+    function _verifyMultiHopResults(MultiHopTestState memory state, uint256 initialBalanceA, uint256 initialBalanceC)
+        private
+    {
+        uint256 finalBalanceA = IERC20(address(state.tokenA)).balanceOf(USER_SENDER);
+        uint256 finalBalanceC = IERC20(address(state.tokenC)).balanceOf(USER_SENDER);
 
         assertApproxEqAbs(
             initialBalanceA - finalBalanceA,
@@ -1465,32 +1165,20 @@ contract LiFiDexAggregatorAlgebraTest is LiFiDexAggregatorTest {
         assertGt(finalBalanceC, initialBalanceC, "TokenC not received");
 
         emit log_named_uint(
-            state.isFeeOnTransfer
-                ? "Output amount with fee tokens"
-                : "Output amount with regular tokens",
+            state.isFeeOnTransfer ? "Output amount with fee tokens" : "Output amount with regular tokens",
             finalBalanceC - initialBalanceC
         );
     }
 
     // Helper function to create an Algebra pool
-    function _createAlgebraPool(
-        address tokenA,
-        address tokenB
-    ) internal returns (address pool) {
+    function _createAlgebraPool(address tokenA, address tokenB) internal returns (address pool) {
         // Call the actual Algebra factory to create a pool
-        pool = IAlgebraFactory(ALGEBRA_FACTORY_APECHAIN).createPool(
-            tokenA,
-            tokenB
-        );
+        pool = IAlgebraFactory(ALGEBRA_FACTORY_APECHAIN).createPool(tokenA, tokenB);
         return pool;
     }
 
     // Helper function to add liquidity to a pool
-    function _addLiquidityToPool(
-        address pool,
-        address token0,
-        address token1
-    ) internal {
+    function _addLiquidityToPool(address pool, address token0, address token1) internal {
         // For fee-on-transfer tokens, we need to send more  to account for the fee
         // We'll use a small amount and send extra to cover fees
         uint256 initialAmount0 = 1e17; // 0.1 token
@@ -1505,33 +1193,18 @@ contract LiFiDexAggregatorAlgebraTest is LiFiDexAggregatorTest {
         IAlgebraPool(pool).initialize(initialPrice);
 
         // Create AlgebraLiquidityAdderHelper with safe transfer logic
-        AlgebraLiquidityAdderHelper algebraLiquidityAdderHelper = new AlgebraLiquidityAdderHelper(
-                token0,
-                token1
-            );
+        AlgebraLiquidityAdderHelper algebraLiquidityAdderHelper = new AlgebraLiquidityAdderHelper(token0, token1);
 
         // Transfer tokens with extra amounts to account for fees
-        IERC20(token0).transfer(
-            address(algebraLiquidityAdderHelper),
-            transferAmount0
-        );
-        IERC20(token1).transfer(
-            address(algebraLiquidityAdderHelper),
-            transferAmount1
-        );
+        IERC20(token0).transfer(address(algebraLiquidityAdderHelper), transferAmount0);
+        IERC20(token1).transfer(address(algebraLiquidityAdderHelper), transferAmount1);
 
         // Get actual balances to use for liquidity, accounting for any fees
-        uint256 actualBalance0 = IERC20(token0).balanceOf(
-            address(algebraLiquidityAdderHelper)
-        );
-        uint256 actualBalance1 = IERC20(token1).balanceOf(
-            address(algebraLiquidityAdderHelper)
-        );
+        uint256 actualBalance0 = IERC20(token0).balanceOf(address(algebraLiquidityAdderHelper));
+        uint256 actualBalance1 = IERC20(token1).balanceOf(address(algebraLiquidityAdderHelper));
 
         // Use the smaller of the two balances for liquidity amount
-        uint128 liquidityAmount = uint128(
-            actualBalance0 < actualBalance1 ? actualBalance0 : actualBalance1
-        );
+        uint128 liquidityAmount = uint128(actualBalance0 < actualBalance1 ? actualBalance0 : actualBalance1);
 
         // Add liquidity using the actual token amounts we have
         algebraLiquidityAdderHelper.addLiquidity(
@@ -1562,14 +1235,10 @@ contract LiFiDexAggregatorAlgebraTest is LiFiDexAggregatorTest {
     }
 
     // Helper function to build route for Apechain Algebra swap
-    function _buildAlgebraRoute(
-        AlgebraRouteParams memory params
-    ) internal view returns (bytes memory route) {
+    function _buildAlgebraRoute(AlgebraRouteParams memory params) internal view returns (bytes memory route) {
         address token0 = IAlgebraPool(params.pool).token0();
         bool zeroForOne = (params.tokenIn == token0);
-        SwapDirection direction = zeroForOne
-            ? SwapDirection.Token0ToToken1
-            : SwapDirection.Token1ToToken0;
+        SwapDirection direction = zeroForOne ? SwapDirection.Token0ToToken1 : SwapDirection.Token1ToToken0;
 
         route = abi.encodePacked(
             params.commandCode,
@@ -1596,23 +1265,11 @@ contract LiFiDexAggregatorAlgebraTest is LiFiDexAggregatorTest {
         // Get token0 from pool and label tokens accordingly
         address token0 = IAlgebraPool(pool).token0();
         if (params.tokenIn == token0) {
-            vm.label(
-                params.tokenIn,
-                string.concat("token0 (", ERC20(params.tokenIn).symbol(), ")")
-            );
-            vm.label(
-                params.tokenOut,
-                string.concat("token1 (", ERC20(params.tokenOut).symbol(), ")")
-            );
+            vm.label(params.tokenIn, string.concat("token0 (", ERC20(params.tokenIn).symbol(), ")"));
+            vm.label(params.tokenOut, string.concat("token1 (", ERC20(params.tokenOut).symbol(), ")"));
         } else {
-            vm.label(
-                params.tokenIn,
-                string.concat("token1 (", ERC20(params.tokenIn).symbol(), ")")
-            );
-            vm.label(
-                params.tokenOut,
-                string.concat("token0 (", ERC20(params.tokenOut).symbol(), ")")
-            );
+            vm.label(params.tokenIn, string.concat("token1 (", ERC20(params.tokenIn).symbol(), ")"));
+            vm.label(params.tokenOut, string.concat("token0 (", ERC20(params.tokenOut).symbol(), ")"));
         }
 
         // Record initial balances
@@ -1626,16 +1283,11 @@ contract LiFiDexAggregatorAlgebraTest is LiFiDexAggregatorTest {
         // The Quoter cannot accurately predict transfer fees taken by the token contract itself,
         // resulting in minor "dust" differences that are normal and expected when dealing with
         // non-standard token implementations.
-        uint256 expectedOutput = _getQuoteExactInput(
-            params.tokenIn,
-            params.tokenOut,
-            params.amountIn
-        );
+        uint256 expectedOutput = _getQuoteExactInput(params.tokenIn, params.tokenOut, params.amountIn);
 
         // Build the route
-        CommandType commandCode = params.from == address(liFiDEXAggregator)
-            ? CommandType.ProcessMyERC20
-            : CommandType.ProcessUserERC20;
+        CommandType commandCode =
+            params.from == address(liFiDEXAggregator) ? CommandType.ProcessMyERC20 : CommandType.ProcessUserERC20;
         bytes memory route = _buildAlgebraRoute(
             AlgebraRouteParams({
                 commandCode: commandCode,
@@ -1647,37 +1299,17 @@ contract LiFiDexAggregatorAlgebraTest is LiFiDexAggregatorTest {
         );
 
         // Approve tokens
-        IERC20(params.tokenIn).approve(
-            address(liFiDEXAggregator),
-            params.amountIn
-        );
+        IERC20(params.tokenIn).approve(address(liFiDEXAggregator), params.amountIn);
 
         // Execute the swap
-        address from = params.from == address(liFiDEXAggregator)
-            ? USER_SENDER
-            : params.from;
+        address from = params.from == address(liFiDEXAggregator) ? USER_SENDER : params.from;
 
         vm.expectEmit(true, true, true, false);
-        emit Route(
-            from,
-            params.to,
-            params.tokenIn,
-            params.tokenOut,
-            params.amountIn,
-            expectedOutput,
-            expectedOutput
-        );
+        emit Route(from, params.to, params.tokenIn, params.tokenOut, params.amountIn, expectedOutput, expectedOutput);
 
         uint256 minOut = (expectedOutput * 995) / 1000; // 0.5% slippage
 
-        liFiDEXAggregator.processRoute(
-            params.tokenIn,
-            params.amountIn,
-            params.tokenOut,
-            minOut,
-            params.to,
-            route
-        );
+        liFiDEXAggregator.processRoute(params.tokenIn, params.amountIn, params.tokenOut, minOut, params.to, route);
 
         uint256 finalTokenIn = IERC20(params.tokenIn).balanceOf(params.from);
         uint256 finalTokenOut = IERC20(params.tokenOut).balanceOf(params.to);
@@ -1691,25 +1323,17 @@ contract LiFiDexAggregatorAlgebraTest is LiFiDexAggregatorTest {
         assertGt(finalTokenOut, initialTokenOut, "TokenOut not received");
     }
 
-    function _getPool(
-        address tokenA,
-        address tokenB
-    ) private view returns (address pool) {
-        pool = IAlgebraRouter(ALGEBRA_FACTORY_APECHAIN).poolByPair(
-            tokenA,
-            tokenB
-        );
+    function _getPool(address tokenA, address tokenB) private view returns (address pool) {
+        pool = IAlgebraRouter(ALGEBRA_FACTORY_APECHAIN).poolByPair(tokenA, tokenB);
         if (pool == address(0)) revert PoolDoesNotExist();
         return pool;
     }
 
-    function _getQuoteExactInput(
-        address tokenIn,
-        address tokenOut,
-        uint256 amountIn
-    ) private returns (uint256 amountOut) {
-        (amountOut, ) = IAlgebraQuoter(ALGEBRA_QUOTER_V2_APECHAIN)
-            .quoteExactInputSingle(tokenIn, tokenOut, amountIn, 0);
+    function _getQuoteExactInput(address tokenIn, address tokenOut, uint256 amountIn)
+        private
+        returns (uint256 amountOut)
+    {
+        (amountOut,) = IAlgebraQuoter(ALGEBRA_QUOTER_V2_APECHAIN).quoteExactInputSingle(tokenIn, tokenOut, amountIn, 0);
         return amountOut;
     }
 
@@ -1721,11 +1345,7 @@ contract LiFiDexAggregatorAlgebraTest is LiFiDexAggregatorTest {
         vm.startPrank(USER_SENDER);
 
         // Mock token0() call on address(0)
-        vm.mockCall(
-            address(0),
-            abi.encodeWithSelector(IAlgebraPool.token0.selector),
-            abi.encode(APE_ETH_TOKEN)
-        );
+        vm.mockCall(address(0), abi.encodeWithSelector(IAlgebraPool.token0.selector), abi.encode(APE_ETH_TOKEN));
 
         // Build route with address(0) as pool
         bytes memory route = _buildAlgebraRoute(
@@ -1744,14 +1364,7 @@ contract LiFiDexAggregatorAlgebraTest is LiFiDexAggregatorTest {
         // Expect revert with InvalidCallData
         vm.expectRevert(InvalidCallData.selector);
 
-        liFiDEXAggregator.processRoute(
-            APE_ETH_TOKEN,
-            1 * 1e18,
-            address(WETH_TOKEN),
-            0,
-            USER_SENDER,
-            route
-        );
+        liFiDEXAggregator.processRoute(APE_ETH_TOKEN, 1 * 1e18, address(WETH_TOKEN), 0, USER_SENDER, route);
 
         vm.stopPrank();
         vm.clearMockedCalls();
@@ -1766,9 +1379,7 @@ contract LiFiDexAggregatorAlgebraTest is LiFiDexAggregatorTest {
 
         // Mock token0() call on IMPOSSIBLE_POOL_ADDRESS
         vm.mockCall(
-            IMPOSSIBLE_POOL_ADDRESS,
-            abi.encodeWithSelector(IAlgebraPool.token0.selector),
-            abi.encode(APE_ETH_TOKEN)
+            IMPOSSIBLE_POOL_ADDRESS, abi.encodeWithSelector(IAlgebraPool.token0.selector), abi.encode(APE_ETH_TOKEN)
         );
 
         // Build route with IMPOSSIBLE_POOL_ADDRESS as pool
@@ -1788,14 +1399,7 @@ contract LiFiDexAggregatorAlgebraTest is LiFiDexAggregatorTest {
         // Expect revert with InvalidCallData
         vm.expectRevert(InvalidCallData.selector);
 
-        liFiDEXAggregator.processRoute(
-            APE_ETH_TOKEN,
-            1 * 1e18,
-            address(WETH_TOKEN),
-            0,
-            USER_SENDER,
-            route
-        );
+        liFiDEXAggregator.processRoute(APE_ETH_TOKEN, 1 * 1e18, address(WETH_TOKEN), 0, USER_SENDER, route);
 
         vm.stopPrank();
         vm.clearMockedCalls();
@@ -1810,9 +1414,7 @@ contract LiFiDexAggregatorAlgebraTest is LiFiDexAggregatorTest {
 
         // Mock token0() call on the pool
         vm.mockCall(
-            ALGEBRA_POOL_APECHAIN,
-            abi.encodeWithSelector(IAlgebraPool.token0.selector),
-            abi.encode(APE_ETH_TOKEN)
+            ALGEBRA_POOL_APECHAIN, abi.encodeWithSelector(IAlgebraPool.token0.selector), abi.encode(APE_ETH_TOKEN)
         );
 
         // Build route with address(0) as recipient
@@ -1832,14 +1434,7 @@ contract LiFiDexAggregatorAlgebraTest is LiFiDexAggregatorTest {
         // Expect revert with InvalidCallData
         vm.expectRevert(InvalidCallData.selector);
 
-        liFiDEXAggregator.processRoute(
-            APE_ETH_TOKEN,
-            1 * 1e18,
-            address(WETH_TOKEN),
-            0,
-            USER_SENDER,
-            route
-        );
+        liFiDEXAggregator.processRoute(APE_ETH_TOKEN, 1 * 1e18, address(WETH_TOKEN), 0, USER_SENDER, route);
 
         vm.stopPrank();
         vm.clearMockedCalls();
@@ -1853,18 +1448,13 @@ contract LiFiDexAggregatorAlgebraTest is LiFiDexAggregatorTest {
 contract LiFiDexAggregatorIzumiV3Test is LiFiDexAggregatorTest {
     // ==================== iZiSwap V3 specific variables ====================
     // Base constants
-    address internal constant USDC =
-        0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913;
-    address internal constant WETH =
-        0x4200000000000000000000000000000000000006;
-    address internal constant USDB_C =
-        0xd9aAEc86B65D86f6A7B5B1b0c42FFA531710b6CA;
+    address internal constant USDC = 0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913;
+    address internal constant WETH = 0x4200000000000000000000000000000000000006;
+    address internal constant USDB_C = 0xd9aAEc86B65D86f6A7B5B1b0c42FFA531710b6CA;
 
     // iZiSwap pools
-    address internal constant IZUMI_WETH_USDC_POOL =
-        0xb92A9A91a9F7E8e6Bb848508A6DaF08f9D718554;
-    address internal constant IZUMI_WETH_USDB_C_POOL =
-        0xdb5D62f06EEcEf0Da7506e0700c2f03c57016De5;
+    address internal constant IZUMI_WETH_USDC_POOL = 0xb92A9A91a9F7E8e6Bb848508A6DaF08f9D718554;
+    address internal constant IZUMI_WETH_USDB_C_POOL = 0xdb5D62f06EEcEf0Da7506e0700c2f03c57016De5;
 
     // Test parameters
     uint256 internal constant AMOUNT_USDC = 100 * 1e6; // 100 USDC with 6 decimals
@@ -1953,24 +1543,13 @@ contract LiFiDexAggregatorIzumiV3Test is LiFiDexAggregatorTest {
 
         // fix the swap data encoding
         bytes memory swapData = _buildIzumiV3Route(
-            CommandType.ProcessUserERC20,
-            USDC,
-            uint8(SwapDirection.Token1ToToken0),
-            IZUMI_WETH_USDC_POOL,
-            USER_RECEIVER
+            CommandType.ProcessUserERC20, USDC, uint8(SwapDirection.Token1ToToken0), IZUMI_WETH_USDC_POOL, USER_RECEIVER
         );
 
         vm.expectEmit(true, true, true, false);
         emit Route(USER_SENDER, USER_RECEIVER, USDC, WETH, AMOUNT_USDC, 0, 0);
 
-        liFiDEXAggregator.processRoute(
-            USDC,
-            AMOUNT_USDC,
-            WETH,
-            0,
-            USER_RECEIVER,
-            swapData
-        );
+        liFiDEXAggregator.processRoute(USDC, AMOUNT_USDC, WETH, 0, USER_RECEIVER, swapData);
 
         vm.stopPrank();
     }
@@ -1985,11 +1564,7 @@ contract LiFiDexAggregatorIzumiV3Test is LiFiDexAggregatorTest {
 
         // create a route with an invalid pool
         bytes memory invalidRoute = _buildIzumiV3Route(
-            CommandType.ProcessUserERC20,
-            USDC,
-            uint8(SwapDirection.Token1ToToken0),
-            invalidPool,
-            USER_SENDER
+            CommandType.ProcessUserERC20, USDC, uint8(SwapDirection.Token1ToToken0), invalidPool, USER_SENDER
         );
 
         IERC20(USDC).approve(address(liFiDEXAggregator), AMOUNT_USDC);
@@ -2003,14 +1578,7 @@ contract LiFiDexAggregatorIzumiV3Test is LiFiDexAggregatorTest {
 
         vm.expectRevert(IzumiV3SwapUnexpected.selector);
 
-        liFiDEXAggregator.processRoute(
-            USDC,
-            AMOUNT_USDC,
-            WETH,
-            0,
-            USER_SENDER,
-            invalidRoute
-        );
+        liFiDEXAggregator.processRoute(USDC, AMOUNT_USDC, WETH, 0, USER_SENDER, invalidRoute);
 
         vm.stopPrank();
         vm.clearMockedCalls();
@@ -2026,11 +1594,7 @@ contract LiFiDexAggregatorIzumiV3Test is LiFiDexAggregatorTest {
         IERC20(USDC).approve(address(liFiDEXAggregator), AMOUNT_USDC);
 
         // mock the pool to call the callback directly without setting lastCalledPool
-        vm.mockCall(
-            invalidPool,
-            abi.encodeWithSignature("swapY2X(address,uint128,int24,bytes)"),
-            abi.encode(0, 0)
-        );
+        vm.mockCall(invalidPool, abi.encodeWithSignature("swapY2X(address,uint128,int24,bytes)"), abi.encode(0, 0));
 
         // try to call the callback directly from the pool without setting lastCalledPool
         vm.prank(invalidPool);
@@ -2068,22 +1632,11 @@ contract LiFiDexAggregatorIzumiV3Test is LiFiDexAggregatorTest {
 
         // fix the swap data encoding
         bytes memory swapData = _buildIzumiV3Route(
-            CommandType.ProcessUserERC20,
-            WETH,
-            uint8(SwapDirection.Token0ToToken1),
-            IZUMI_WETH_USDC_POOL,
-            USER_RECEIVER
+            CommandType.ProcessUserERC20, WETH, uint8(SwapDirection.Token0ToToken1), IZUMI_WETH_USDC_POOL, USER_RECEIVER
         );
 
         vm.expectRevert(InvalidCallData.selector);
-        liFiDEXAggregator.processRoute(
-            WETH,
-            type(uint216).max,
-            USDC,
-            0,
-            USER_RECEIVER,
-            swapData
-        );
+        liFiDEXAggregator.processRoute(WETH, type(uint216).max, USDC, 0, USER_RECEIVER, swapData);
 
         vm.stopPrank();
     }
@@ -2095,17 +1648,12 @@ contract LiFiDexAggregatorIzumiV3Test is LiFiDexAggregatorTest {
         }
 
         // Capture initial token balances
-        uint256 initialBalanceIn = IERC20(params.tokenIn).balanceOf(
-            params.from
-        );
-        uint256 initialBalanceOut = IERC20(params.tokenOut).balanceOf(
-            params.to
-        );
+        uint256 initialBalanceIn = IERC20(params.tokenIn).balanceOf(params.from);
+        uint256 initialBalanceOut = IERC20(params.tokenOut).balanceOf(params.to);
 
         // Build the route based on the command type
-        CommandType commandCode = params.from == address(liFiDEXAggregator)
-            ? CommandType.ProcessMyERC20
-            : CommandType.ProcessUserERC20;
+        CommandType commandCode =
+            params.from == address(liFiDEXAggregator) ? CommandType.ProcessMyERC20 : CommandType.ProcessUserERC20;
 
         // Construct the route
         bytes memory route = _buildIzumiV3Route(
@@ -2119,16 +1667,11 @@ contract LiFiDexAggregatorIzumiV3Test is LiFiDexAggregatorTest {
         // Approve tokens if necessary
         if (params.from == USER_SENDER) {
             vm.startPrank(USER_SENDER);
-            IERC20(params.tokenIn).approve(
-                address(liFiDEXAggregator),
-                params.amountIn
-            );
+            IERC20(params.tokenIn).approve(address(liFiDEXAggregator), params.amountIn);
         }
 
         // Expect the Route event emission
-        address from = params.from == address(liFiDEXAggregator)
-            ? USER_SENDER
-            : params.from;
+        address from = params.from == address(liFiDEXAggregator) ? USER_SENDER : params.from;
 
         vm.expectEmit(true, true, true, false);
         emit Route(
@@ -2166,11 +1709,7 @@ contract LiFiDexAggregatorIzumiV3Test is LiFiDexAggregatorTest {
             "TokenIn amount mismatch"
         );
         assertGt(finalBalanceOut, initialBalanceOut, "TokenOut not received");
-        assertEq(
-            amountOut,
-            finalBalanceOut - initialBalanceOut,
-            "AmountOut mismatch"
-        );
+        assertEq(amountOut, finalBalanceOut - initialBalanceOut, "AmountOut mismatch");
 
         emit log_named_uint("Amount In", params.amountIn);
         emit log_named_uint("Amount Out", amountOut);
@@ -2192,10 +1731,7 @@ contract LiFiDexAggregatorIzumiV3Test is LiFiDexAggregatorTest {
 
         // Approve tokens
         vm.startPrank(USER_SENDER);
-        IERC20(params.tokenIn).approve(
-            address(liFiDEXAggregator),
-            params.amountIn
-        );
+        IERC20(params.tokenIn).approve(address(liFiDEXAggregator), params.amountIn);
 
         // Execute the swap
         uint256 amountOut = liFiDEXAggregator.processRoute(
@@ -2215,17 +1751,9 @@ contract LiFiDexAggregatorIzumiV3Test is LiFiDexAggregatorTest {
         finalBalanceIn = IERC20(params.tokenIn).balanceOf(USER_SENDER);
         finalBalanceOut = IERC20(params.tokenOut).balanceOf(USER_SENDER);
 
-        assertEq(
-            initialBalanceIn - finalBalanceIn,
-            params.amountIn,
-            "TokenIn amount mismatch"
-        );
+        assertEq(initialBalanceIn - finalBalanceIn, params.amountIn, "TokenIn amount mismatch");
         assertGt(finalBalanceOut, initialBalanceOut, "TokenOut not received");
-        assertEq(
-            amountOut,
-            finalBalanceOut - initialBalanceOut,
-            "AmountOut mismatch"
-        );
+        assertEq(amountOut, finalBalanceOut - initialBalanceOut, "AmountOut mismatch");
     }
 
     function _buildIzumiV3Route(
@@ -2235,22 +1763,19 @@ contract LiFiDexAggregatorIzumiV3Test is LiFiDexAggregatorTest {
         address pool,
         address recipient
     ) internal pure returns (bytes memory) {
-        return
-            abi.encodePacked(
-                uint8(commandCode),
-                tokenIn,
-                uint8(1), // number of pools (1)
-                FULL_SHARE, // 100% share
-                uint8(PoolType.iZiSwap), // pool type
-                pool,
-                uint8(direction),
-                recipient
-            );
+        return abi.encodePacked(
+            uint8(commandCode),
+            tokenIn,
+            uint8(1), // number of pools (1)
+            FULL_SHARE, // 100% share
+            uint8(PoolType.iZiSwap), // pool type
+            pool,
+            uint8(direction),
+            recipient
+        );
     }
 
-    function _buildIzumiV3MultiHopRoute(
-        MultiHopTestParams memory params
-    ) internal view returns (bytes memory) {
+    function _buildIzumiV3MultiHopRoute(MultiHopTestParams memory params) internal view returns (bytes memory) {
         // First hop: USER_ERC20 -> LDA
         bytes memory firstHop = _buildIzumiV3Route(
             CommandType.ProcessUserERC20,
@@ -2288,11 +1813,9 @@ contract LiFiDexAggregatorHyperswapV3Test is LiFiDexAggregatorTest {
         IHyperswapV3QuoterV2(0x03A918028f22D9E1473B7959C927AD7425A45C7C);
 
     /// @dev a liquid USDT on HyperEVM
-    IERC20 internal constant USDT0 =
-        IERC20(0xB8CE59FC3717ada4C02eaDF9682A9e934F625ebb);
+    IERC20 internal constant USDT0 = IERC20(0xB8CE59FC3717ada4C02eaDF9682A9e934F625ebb);
     /// @dev WHYPE on HyperEVM
-    IERC20 internal constant WHYPE =
-        IERC20(0x5555555555555555555555555555555555555555);
+    IERC20 internal constant WHYPE = IERC20(0x5555555555555555555555555555555555555555);
 
     struct HyperswapV3Params {
         CommandType commandCode; // ProcessMyERC20 or ProcessUserERC20
@@ -2316,26 +1839,20 @@ contract LiFiDexAggregatorHyperswapV3Test is LiFiDexAggregatorTest {
         USDT0.approve(address(liFiDEXAggregator), amountIn);
 
         // fetch the real pool and quote
-        address pool = HYPERSWAP_FACTORY.getPool(
-            address(USDT0),
-            address(WHYPE),
-            3000
-        );
+        address pool = HYPERSWAP_FACTORY.getPool(address(USDT0), address(WHYPE), 3000);
 
         // Create the params struct for quoting
-        IHyperswapV3QuoterV2.QuoteExactInputSingleParams
-            memory params = IHyperswapV3QuoterV2.QuoteExactInputSingleParams({
-                tokenIn: address(USDT0),
-                tokenOut: address(WHYPE),
-                amountIn: amountIn,
-                fee: 3000,
-                sqrtPriceLimitX96: 0
-            });
+        IHyperswapV3QuoterV2.QuoteExactInputSingleParams memory params = IHyperswapV3QuoterV2
+            .QuoteExactInputSingleParams({
+            tokenIn: address(USDT0),
+            tokenOut: address(WHYPE),
+            amountIn: amountIn,
+            fee: 3000,
+            sqrtPriceLimitX96: 0
+        });
 
         // Get the quote using the struct
-        (uint256 quoted, , , ) = HYPERSWAP_QUOTER.quoteExactInputSingle(
-            params
-        );
+        (uint256 quoted,,,) = HYPERSWAP_QUOTER.quoteExactInputSingle(params);
 
         // build the "off-chain" route
         bytes memory route = abi.encodePacked(
@@ -2351,26 +1868,11 @@ contract LiFiDexAggregatorHyperswapV3Test is LiFiDexAggregatorTest {
 
         // expect the Route event
         vm.expectEmit(true, true, true, true);
-        emit Route(
-            USER_SENDER,
-            USER_SENDER,
-            address(USDT0),
-            address(WHYPE),
-            amountIn,
-            quoted,
-            quoted
-        );
+        emit Route(USER_SENDER, USER_SENDER, address(USDT0), address(WHYPE), amountIn, quoted, quoted);
 
         // execute
         vm.prank(USER_SENDER);
-        liFiDEXAggregator.processRoute(
-            address(USDT0),
-            amountIn,
-            address(WHYPE),
-            quoted,
-            USER_SENDER,
-            route
-        );
+        liFiDEXAggregator.processRoute(address(USDT0), amountIn, address(WHYPE), quoted, USER_SENDER, route);
     }
 
     function test_CanSwap_FromDexAggregator() public override {
@@ -2380,26 +1882,20 @@ contract LiFiDexAggregatorHyperswapV3Test is LiFiDexAggregatorTest {
         deal(address(USDT0), address(liFiDEXAggregator), amountIn);
 
         // fetch the real pool and quote
-        address pool = HYPERSWAP_FACTORY.getPool(
-            address(USDT0),
-            address(WHYPE),
-            3000
-        );
+        address pool = HYPERSWAP_FACTORY.getPool(address(USDT0), address(WHYPE), 3000);
 
         // Create the params struct for quoting
-        IHyperswapV3QuoterV2.QuoteExactInputSingleParams
-            memory params = IHyperswapV3QuoterV2.QuoteExactInputSingleParams({
-                tokenIn: address(USDT0),
-                tokenOut: address(WHYPE),
-                amountIn: amountIn - 1, // Subtract 1 to match slot undrain protection
-                fee: 3000,
-                sqrtPriceLimitX96: 0
-            });
+        IHyperswapV3QuoterV2.QuoteExactInputSingleParams memory params = IHyperswapV3QuoterV2
+            .QuoteExactInputSingleParams({
+            tokenIn: address(USDT0),
+            tokenOut: address(WHYPE),
+            amountIn: amountIn - 1, // Subtract 1 to match slot undrain protection
+            fee: 3000,
+            sqrtPriceLimitX96: 0
+        });
 
         // Get the quote using the struct
-        (uint256 quoted, , , ) = HYPERSWAP_QUOTER.quoteExactInputSingle(
-            params
-        );
+        (uint256 quoted,,,) = HYPERSWAP_QUOTER.quoteExactInputSingle(params);
 
         // Build route using our helper function
         bytes memory route = _buildHyperswapV3Route(
@@ -2445,9 +1941,7 @@ contract LiFiDexAggregatorHyperswapV3Test is LiFiDexAggregatorTest {
         // in a single processRoute invocation.
     }
 
-    function _buildHyperswapV3Route(
-        HyperswapV3Params memory params
-    ) internal pure returns (bytes memory route) {
+    function _buildHyperswapV3Route(HyperswapV3Params memory params) internal pure returns (bytes memory route) {
         route = abi.encodePacked(
             uint8(params.commandCode),
             params.tokenIn,
@@ -2469,13 +1963,10 @@ contract LiFiDexAggregatorHyperswapV3Test is LiFiDexAggregatorTest {
 contract LiFiDexAggregatorLaminarV3Test is LiFiDexAggregatorTest {
     using SafeERC20 for IERC20;
 
-    IERC20 internal constant WHYPE =
-        IERC20(0x5555555555555555555555555555555555555555);
-    IERC20 internal constant LHYPE =
-        IERC20(0x5748ae796AE46A4F1348a1693de4b50560485562);
+    IERC20 internal constant WHYPE = IERC20(0x5555555555555555555555555555555555555555);
+    IERC20 internal constant LHYPE = IERC20(0x5748ae796AE46A4F1348a1693de4b50560485562);
 
-    address internal constant WHYPE_LHYPE_POOL =
-        0xdAA8a66380fb35b35CB7bc1dBC1925AbfdD0ae45;
+    address internal constant WHYPE_LHYPE_POOL = 0xdAA8a66380fb35b35CB7bc1dBC1925AbfdD0ae45;
 
     function setUp() public override {
         setupHyperEVM();
@@ -2508,14 +1999,7 @@ contract LiFiDexAggregatorLaminarV3Test is LiFiDexAggregatorTest {
         uint256 outBefore = LHYPE.balanceOf(USER_SENDER);
 
         // Execute swap (minOut = 0 for test)
-        liFiDEXAggregator.processRoute(
-            address(WHYPE),
-            amountIn,
-            address(LHYPE),
-            0,
-            USER_SENDER,
-            route
-        );
+        liFiDEXAggregator.processRoute(address(WHYPE), amountIn, address(LHYPE), 0, USER_SENDER, route);
 
         // Verify
         uint256 inAfter = WHYPE.balanceOf(USER_SENDER);
@@ -2549,14 +2033,7 @@ contract LiFiDexAggregatorLaminarV3Test is LiFiDexAggregatorTest {
         uint256 outBefore = LHYPE.balanceOf(USER_SENDER);
 
         // Withdraw 1 wei to avoid slot-undrain protection
-        liFiDEXAggregator.processRoute(
-            address(WHYPE),
-            amountIn - 1,
-            address(LHYPE),
-            0,
-            USER_SENDER,
-            route
-        );
+        liFiDEXAggregator.processRoute(address(WHYPE), amountIn - 1, address(LHYPE), 0, USER_SENDER, route);
 
         uint256 outAfter = LHYPE.balanceOf(USER_SENDER);
         assertGt(outAfter - outBefore, 0, "Should receive LHYPE");
@@ -2577,14 +2054,11 @@ contract LiFiDexAggregatorLaminarV3Test is LiFiDexAggregatorTest {
 contract LiFiDexAggregatorXSwapV3Test is LiFiDexAggregatorTest {
     using SafeERC20 for IERC20;
 
-    address internal constant USDC_E_WXDC_POOL =
-        0x81B4afF811E94fb084A0d3B3ca456D09AeC14EB0;
+    address internal constant USDC_E_WXDC_POOL = 0x81B4afF811E94fb084A0d3B3ca456D09AeC14EB0;
 
     /// @dev our two tokens: USDC.e and wrapped XDC
-    IERC20 internal constant USDC_E =
-        IERC20(0x2A8E898b6242355c290E1f4Fc966b8788729A4D4);
-    IERC20 internal constant WXDC =
-        IERC20(0x951857744785E80e2De051c32EE7b25f9c458C42);
+    IERC20 internal constant USDC_E = IERC20(0x2A8E898b6242355c290E1f4Fc966b8788729A4D4);
+    IERC20 internal constant WXDC = IERC20(0x951857744785E80e2De051c32EE7b25f9c458C42);
 
     function setUp() public override {
         customRpcUrlForForking = "ETH_NODE_URI_XDC";
@@ -2618,14 +2092,7 @@ contract LiFiDexAggregatorXSwapV3Test is LiFiDexAggregatorTest {
         uint256 outBefore = WXDC.balanceOf(USER_SENDER);
 
         // Execute swap (minOut = 0 for test)
-        liFiDEXAggregator.processRoute(
-            address(USDC_E),
-            amountIn,
-            address(WXDC),
-            0,
-            USER_SENDER,
-            route
-        );
+        liFiDEXAggregator.processRoute(address(USDC_E), amountIn, address(WXDC), 0, USER_SENDER, route);
 
         // Verify balances after swap
         uint256 inAfter = USDC_E.balanceOf(USER_SENDER);
@@ -2662,14 +2129,7 @@ contract LiFiDexAggregatorXSwapV3Test is LiFiDexAggregatorTest {
         // Record balances before swap
         uint256 outBefore = WXDC.balanceOf(USER_SENDER);
 
-        liFiDEXAggregator.processRoute(
-            address(USDC_E),
-            swapAmount,
-            address(WXDC),
-            0,
-            USER_SENDER,
-            route
-        );
+        liFiDEXAggregator.processRoute(address(USDC_E), swapAmount, address(WXDC), 0, USER_SENDER, route);
 
         // Verify balances after swap
         uint256 outAfter = WXDC.balanceOf(USER_SENDER);
@@ -2695,12 +2155,9 @@ contract LiFiDexAggregatorRabbitSwapTest is LiFiDexAggregatorTest {
     using SafeERC20 for IERC20;
 
     // Constants for RabbitSwap on Viction
-    IERC20 internal constant SOROS =
-        IERC20(0xB786D9c8120D311b948cF1e5Aa48D8fBacf477E2);
-    IERC20 internal constant C98 =
-        IERC20(0x0Fd0288AAAE91eaF935e2eC14b23486f86516c8C);
-    address internal constant SOROS_C98_POOL =
-        0xF10eFaE2DdAC396c4ef3c52009dB429A120d0C0D;
+    IERC20 internal constant SOROS = IERC20(0xB786D9c8120D311b948cF1e5Aa48D8fBacf477E2);
+    IERC20 internal constant C98 = IERC20(0x0Fd0288AAAE91eaF935e2eC14b23486f86516c8C);
+    address internal constant SOROS_C98_POOL = 0xF10eFaE2DdAC396c4ef3c52009dB429A120d0C0D;
 
     function setUp() public override {
         // setup for Viction network
@@ -2738,14 +2195,7 @@ contract LiFiDexAggregatorRabbitSwapTest is LiFiDexAggregatorTest {
         uint256 outBefore = C98.balanceOf(USER_SENDER);
 
         // execute swap (minOut = 0 for test)
-        liFiDEXAggregator.processRoute(
-            address(SOROS),
-            amountIn,
-            address(C98),
-            0,
-            USER_SENDER,
-            route
-        );
+        liFiDEXAggregator.processRoute(address(SOROS), amountIn, address(C98), 0, USER_SENDER, route);
 
         // verify balances after swap
         uint256 inAfter = SOROS.balanceOf(USER_SENDER);
@@ -2779,14 +2229,7 @@ contract LiFiDexAggregatorRabbitSwapTest is LiFiDexAggregatorTest {
         uint256 outBefore = C98.balanceOf(USER_SENDER);
 
         // withdraw 1 wei less to avoid slot-undrain protection
-        liFiDEXAggregator.processRoute(
-            address(SOROS),
-            amountIn - 1,
-            address(C98),
-            0,
-            USER_SENDER,
-            route
-        );
+        liFiDEXAggregator.processRoute(address(SOROS), amountIn - 1, address(C98), 0, USER_SENDER, route);
 
         uint256 outAfter = C98.balanceOf(USER_SENDER);
         assertGt(outAfter - outBefore, 0, "Should receive C98");
@@ -2823,14 +2266,7 @@ contract LiFiDexAggregatorRabbitSwapTest is LiFiDexAggregatorTest {
         );
 
         vm.expectRevert(InvalidCallData.selector);
-        liFiDEXAggregator.processRoute(
-            address(SOROS),
-            amountIn,
-            address(C98),
-            0,
-            USER_SENDER,
-            route
-        );
+        liFiDEXAggregator.processRoute(address(SOROS), amountIn, address(C98), 0, USER_SENDER, route);
 
         vm.stopPrank();
     }
@@ -2855,14 +2291,7 @@ contract LiFiDexAggregatorRabbitSwapTest is LiFiDexAggregatorTest {
         );
 
         vm.expectRevert(InvalidCallData.selector);
-        liFiDEXAggregator.processRoute(
-            address(SOROS),
-            amountIn,
-            address(C98),
-            0,
-            USER_SENDER,
-            route
-        );
+        liFiDEXAggregator.processRoute(address(SOROS), amountIn, address(C98), 0, USER_SENDER, route);
 
         vm.stopPrank();
     }
@@ -2875,16 +2304,13 @@ contract LiFiDexAggregatorEnosysDexV3Test is LiFiDexAggregatorTest {
     using SafeERC20 for IERC20;
 
     /// @dev HLN token on Flare
-    IERC20 internal constant HLN =
-        IERC20(0x140D8d3649Ec605CF69018C627fB44cCC76eC89f);
+    IERC20 internal constant HLN = IERC20(0x140D8d3649Ec605CF69018C627fB44cCC76eC89f);
 
     /// @dev USDT0 token on Flare
-    IERC20 internal constant USDT0 =
-        IERC20(0xe7cd86e13AC4309349F30B3435a9d337750fC82D);
+    IERC20 internal constant USDT0 = IERC20(0xe7cd86e13AC4309349F30B3435a9d337750fC82D);
 
     /// @dev The single EnosysDexV3 pool for HLN–USDT0
-    address internal constant ENOSYS_V3_POOL =
-        0xA7C9E7343bD8f1eb7000F25dE5aeb52c6B78B1b7;
+    address internal constant ENOSYS_V3_POOL = 0xA7C9E7343bD8f1eb7000F25dE5aeb52c6B78B1b7;
 
     /// @notice Set up a fork of Flare at block 42652369 and initialize the aggregator
     function setUp() public override {
@@ -2922,14 +2348,7 @@ contract LiFiDexAggregatorEnosysDexV3Test is LiFiDexAggregatorTest {
         uint256 outBefore = USDT0.balanceOf(USER_SENDER);
 
         // Execute the swap (minOut = 0 for test)
-        liFiDEXAggregator.processRoute(
-            address(HLN),
-            amountIn,
-            address(USDT0),
-            0,
-            USER_SENDER,
-            route
-        );
+        liFiDEXAggregator.processRoute(address(HLN), amountIn, address(USDT0), 0, USER_SENDER, route);
 
         // Verify that HLN was spent and some USDT0 was received
         uint256 inAfter = HLN.balanceOf(USER_SENDER);
@@ -2965,14 +2384,7 @@ contract LiFiDexAggregatorEnosysDexV3Test is LiFiDexAggregatorTest {
         uint256 swapAmount = amountIn - 1;
         uint256 outBefore = USDT0.balanceOf(USER_SENDER);
 
-        liFiDEXAggregator.processRoute(
-            address(HLN),
-            swapAmount,
-            address(USDT0),
-            0,
-            USER_SENDER,
-            route
-        );
+        liFiDEXAggregator.processRoute(address(HLN), swapAmount, address(USDT0), 0, USER_SENDER, route);
 
         // Verify that some USDT0 was received
         uint256 outAfter = USDT0.balanceOf(USER_SENDER);
@@ -2997,22 +2409,15 @@ contract LiFiDexAggregatorEnosysDexV3Test is LiFiDexAggregatorTest {
 contract LiFiDexAggregatorSyncSwapV2Test is LiFiDexAggregatorTest {
     using SafeERC20 for IERC20;
 
-    IERC20 internal constant USDC =
-        IERC20(0x176211869cA2b568f2A7D4EE941E073a821EE1ff);
-    IERC20 internal constant WETH =
-        IERC20(0xe5D7C2a44FfDDf6b295A15c148167daaAf5Cf34f);
-    address internal constant USDC_WETH_POOL_V1 =
-        address(0x5Ec5b1E9b1Bd5198343ABB6E55Fb695d2F7Bb308);
-    address internal constant SYNC_SWAP_VAULT =
-        address(0x7160570BB153Edd0Ea1775EC2b2Ac9b65F1aB61B);
+    IERC20 internal constant USDC = IERC20(0x176211869cA2b568f2A7D4EE941E073a821EE1ff);
+    IERC20 internal constant WETH = IERC20(0xe5D7C2a44FfDDf6b295A15c148167daaAf5Cf34f);
+    address internal constant USDC_WETH_POOL_V1 = address(0x5Ec5b1E9b1Bd5198343ABB6E55Fb695d2F7Bb308);
+    address internal constant SYNC_SWAP_VAULT = address(0x7160570BB153Edd0Ea1775EC2b2Ac9b65F1aB61B);
 
-    address internal constant USDC_WETH_POOL_V2 =
-        address(0xDDed227D71A096c6B5D87807C1B5C456771aAA94);
+    address internal constant USDC_WETH_POOL_V2 = address(0xDDed227D71A096c6B5D87807C1B5C456771aAA94);
 
-    IERC20 internal constant USDT =
-        IERC20(0xA219439258ca9da29E9Cc4cE5596924745e12B93);
-    address internal constant USDC_USDT_POOL_V1 =
-        address(0x258d5f860B11ec73Ee200eB14f1b60A3B7A536a2);
+    IERC20 internal constant USDT = IERC20(0xA219439258ca9da29E9Cc4cE5596924745e12B93);
+    address internal constant USDC_USDT_POOL_V1 = address(0x258d5f860B11ec73Ee200eB14f1b60A3B7A536a2);
 
     /// @notice Set up a fork of Linea at block 20077881 and initialize the aggregator
     function setUp() public override {
@@ -3050,14 +2455,7 @@ contract LiFiDexAggregatorSyncSwapV2Test is LiFiDexAggregatorTest {
         uint256 outBefore = USDC.balanceOf(USER_SENDER);
 
         // Execute the swap (minOut = 0 for test)
-        liFiDEXAggregator.processRoute(
-            address(WETH),
-            amountIn,
-            address(USDC),
-            0,
-            USER_SENDER,
-            route
-        );
+        liFiDEXAggregator.processRoute(address(WETH), amountIn, address(USDC), 0, USER_SENDER, route);
 
         // Verify that WETH was spent and some USDC_C was received
         uint256 inAfter = WETH.balanceOf(USER_SENDER);
@@ -3094,14 +2492,7 @@ contract LiFiDexAggregatorSyncSwapV2Test is LiFiDexAggregatorTest {
         uint256 outBefore = USDC.balanceOf(USER_SENDER);
 
         // Execute the swap (minOut = 0 for test)
-        liFiDEXAggregator.processRoute(
-            address(WETH),
-            amountIn,
-            address(USDC),
-            0,
-            USER_SENDER,
-            route
-        );
+        liFiDEXAggregator.processRoute(address(WETH), amountIn, address(USDC), 0, USER_SENDER, route);
 
         // Verify that WETH was spent and some USDC_C was received
         uint256 inAfter = WETH.balanceOf(USER_SENDER);
@@ -3136,14 +2527,7 @@ contract LiFiDexAggregatorSyncSwapV2Test is LiFiDexAggregatorTest {
         uint256 swapAmount = amountIn - 1;
         uint256 outBefore = USDC.balanceOf(USER_SENDER);
 
-        liFiDEXAggregator.processRoute(
-            address(WETH),
-            swapAmount,
-            address(USDC),
-            0,
-            USER_SENDER,
-            route
-        );
+        liFiDEXAggregator.processRoute(address(WETH), swapAmount, address(USDC), 0, USER_SENDER, route);
 
         // Verify that some USDC was received
         uint256 outAfter = USDC.balanceOf(USER_SENDER);
@@ -3173,14 +2557,7 @@ contract LiFiDexAggregatorSyncSwapV2Test is LiFiDexAggregatorTest {
         uint256 swapAmount = amountIn - 1;
         uint256 outBefore = USDC.balanceOf(USER_SENDER);
 
-        liFiDEXAggregator.processRoute(
-            address(WETH),
-            swapAmount,
-            address(USDC),
-            0,
-            USER_SENDER,
-            route
-        );
+        liFiDEXAggregator.processRoute(address(WETH), swapAmount, address(USDC), 0, USER_SENDER, route);
 
         // Verify that some USDC was received
         uint256 outAfter = USDC.balanceOf(USER_SENDER);
@@ -3231,28 +2608,14 @@ contract LiFiDexAggregatorSyncSwapV2Test is LiFiDexAggregatorTest {
 
         bytes memory route = bytes.concat(hop1, hop2);
 
-        uint256 amountOut = liFiDEXAggregator.processRoute(
-            address(WETH),
-            amountIn,
-            address(USDT),
-            0,
-            USER_SENDER,
-            route
-        );
+        uint256 amountOut =
+            liFiDEXAggregator.processRoute(address(WETH), amountIn, address(USDT), 0, USER_SENDER, route);
 
         uint256 afterBalanceIn = WETH.balanceOf(USER_SENDER);
         uint256 afterBalanceOut = USDT.balanceOf(USER_SENDER);
 
-        assertEq(
-            initialBalanceIn - afterBalanceIn,
-            amountIn,
-            "WETH spent mismatch"
-        );
-        assertEq(
-            amountOut,
-            afterBalanceOut - initialBalanceOut,
-            "USDT amountOut mismatch"
-        );
+        assertEq(initialBalanceIn - afterBalanceIn, amountIn, "WETH spent mismatch");
+        assertEq(amountOut, afterBalanceOut - initialBalanceOut, "USDT amountOut mismatch");
         vm.stopPrank();
     }
 
@@ -3279,14 +2642,7 @@ contract LiFiDexAggregatorSyncSwapV2Test is LiFiDexAggregatorTest {
 
         // Expect revert with InvalidCallData
         vm.expectRevert(InvalidCallData.selector);
-        liFiDEXAggregator.processRoute(
-            address(WETH),
-            amountIn,
-            address(USDC),
-            0,
-            USER_SENDER,
-            route
-        );
+        liFiDEXAggregator.processRoute(address(WETH), amountIn, address(USDC), 0, USER_SENDER, route);
 
         vm.stopPrank();
     }
@@ -3314,14 +2670,7 @@ contract LiFiDexAggregatorSyncSwapV2Test is LiFiDexAggregatorTest {
 
         // Expect revert with InvalidCallData
         vm.expectRevert(InvalidCallData.selector);
-        liFiDEXAggregator.processRoute(
-            address(WETH),
-            amountIn,
-            address(USDC),
-            0,
-            USER_SENDER,
-            routeWithInvalidPool
-        );
+        liFiDEXAggregator.processRoute(address(WETH), amountIn, address(USDC), 0, USER_SENDER, routeWithInvalidPool);
 
         bytes memory routeWithInvalidRecipient = abi.encodePacked(
             uint8(CommandType.ProcessUserERC20), // user funds
@@ -3339,12 +2688,7 @@ contract LiFiDexAggregatorSyncSwapV2Test is LiFiDexAggregatorTest {
         // Expect revert with InvalidCallData
         vm.expectRevert(InvalidCallData.selector);
         liFiDEXAggregator.processRoute(
-            address(WETH),
-            amountIn,
-            address(USDC),
-            0,
-            USER_SENDER,
-            routeWithInvalidRecipient
+            address(WETH), amountIn, address(USDC), 0, USER_SENDER, routeWithInvalidRecipient
         );
 
         vm.stopPrank();
@@ -3368,15 +2712,30 @@ contract LiFiDexAggregatorSyncSwapV2Test is LiFiDexAggregatorTest {
 
         // Expect revert with InvalidCallData because withdrawMode is invalid
         vm.expectRevert(InvalidCallData.selector);
-        liFiDEXAggregator.processRoute(
-            address(WETH),
-            1,
-            address(USDC),
-            0,
-            USER_SENDER,
-            routeWithInvalidWithdrawMode
-        );
+        liFiDEXAggregator.processRoute(address(WETH), 1, address(USDC), 0, USER_SENDER, routeWithInvalidWithdrawMode);
 
         vm.stopPrank();
+    }
+}
+
+contract LiFiDexAggregatorPancakeV3CallbackTest is Test {
+    LiFiDEXAggregator internal liFiDEXAggregator;
+
+    function setUp() public {
+        address[] memory privileged = new address[](1);
+        privileged[0] = address(this);
+        liFiDEXAggregator = new LiFiDEXAggregator(address(0), privileged, address(this));
+    }
+
+    function testRevert_PancakeV3SwapCallbackUnknownSource() public {
+        vm.expectRevert(LiFiDEXAggregator.UniswapV3SwapCallbackUnknownSource.selector);
+        liFiDEXAggregator.pancakeV3SwapCallback(1, 0, abi.encode(address(0)));
+    }
+
+    function testRevert_PancakeV3SwapCallbackNotPositiveAmount() public {
+        vm.store(address(liFiDEXAggregator), bytes32(uint256(3)), bytes32(uint256(uint160(address(this)))));
+        vm.prank(address(this));
+        vm.expectRevert(LiFiDEXAggregator.UniswapV3SwapCallbackNotPositiveAmount.selector);
+        liFiDEXAggregator.pancakeV3SwapCallback(0, 0, abi.encode(address(0)));
     }
 }
