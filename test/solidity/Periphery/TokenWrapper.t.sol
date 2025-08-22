@@ -5,6 +5,7 @@ import { DSTest } from "ds-test/test.sol";
 import { Vm } from "forge-std/Vm.sol";
 import { TokenWrapper } from "lifi/Periphery/TokenWrapper.sol";
 import { TestWrappedToken as ERC20 } from "../utils/TestWrappedToken.sol";
+import { FalseTransferWrappedToken } from "../utils/FalseTransferWrappedToken.sol";
 
 contract TokenWrapperTest is DSTest {
     // solhint-disable immutable-vars-naming
@@ -27,6 +28,20 @@ contract TokenWrapperTest is DSTest {
         assert(wrappedToken.balanceOf(address(this)) == 0);
         tokenWrapper.deposit{ value: 1 ether }();
         assert(wrappedToken.balanceOf(address(this)) == 1 ether);
+    }
+
+    function testDepositFailsSilentlyOnFalseReturn() public {
+        FalseTransferWrappedToken badToken = new FalseTransferWrappedToken();
+        TokenWrapper badWrapper = new TokenWrapper(address(badToken), address(this));
+
+        uint256 startBalance = address(this).balance;
+        badWrapper.deposit{ value: 1 ether }();
+
+        // Ether deducted but no wrapped tokens received
+        assertEq(address(this).balance, startBalance - 1 ether);
+        assertEq(badToken.balanceOf(address(this)), 0);
+        // Tokens remain stuck in the wrapper contract
+        assertEq(badToken.balanceOf(address(badWrapper)), 1 ether);
     }
 
     function testCanWithdrawToken() public {
