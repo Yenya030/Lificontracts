@@ -28,3 +28,5 @@
 | Vector | Severity | Status | Notes |
 | ------ | -------- | ------ | ----- |
 | Using zero address as receiver in swapTokensGeneric | Medium | Mitigated | Reverts with InvalidReceiver; covered by test |
+| Permit2 witness call executed by third party | Medium | Mitigated | Execution by unsignatured caller still honors witness; verified with `forge test --match-test test_can_call_diamond_with_permit2_plus_witness` |
+| EIP-7702 delegated account misclassified as EOA | Medium | Mitigated | `LibAsset.isContract` returns false for 23-byte accounts, preventing contract-only interactions; verified with `forge test --match-test test_isContractWithDelegationDesignator` |
