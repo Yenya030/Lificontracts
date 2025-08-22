@@ -3,6 +3,7 @@ pragma solidity ^0.8.17;
 
 import { GenericSwapFacet } from "lifi/Facets/GenericSwapFacet.sol";
 import { LibAllowList, LibSwap, TestBase } from "../utils/TestBase.sol";
+import { InvalidReceiver } from "lifi/Errors/GenericErrors.sol";
 
 // Stub GenericSwapFacet Contract
 contract TestGenericSwapFacet is GenericSwapFacet {
@@ -203,5 +204,28 @@ contract GenericSwapFacetTest is TestBase {
         emit log_named_uint("gas used V1: ", gasUsed);
 
         vm.stopPrank();
+    }
+
+    function test_RevertIfReceiverIsZeroAddress() public {
+        LibSwap.SwapData[] memory swapData = new LibSwap.SwapData[](1);
+        swapData[0] = LibSwap.SwapData({
+            callTo: address(0),
+            approveTo: address(0),
+            sendingAssetId: address(0),
+            receivingAssetId: address(0),
+            fromAmount: 0,
+            callData: "",
+            requiresDeposit: false
+        });
+
+        vm.expectRevert(InvalidReceiver.selector);
+        genericSwapFacet.swapTokensGeneric(
+            "",
+            "",
+            "",
+            payable(address(0)),
+            0,
+            swapData
+        );
     }
 }
