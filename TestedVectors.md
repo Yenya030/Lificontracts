@@ -24,6 +24,7 @@
 |------|-------------|----------|--------|
 | 2025-02-14 | Unauthorized PancakeV3 swap callback invocation | High | Reverted with `UniswapV3SwapCallbackUnknownSource` |
 | 2025-02-14 | Zero or negative amount in PancakeV3 swap callback | Medium | Reverted with `UniswapV3SwapCallbackNotPositiveAmount` |
+| 2025-08-22 | Reentrancy during token transfer triggers PancakeV3 callback | High | Reverted with `UniswapV3SwapCallbackUnknownSource` |
 
 | Vector | Severity | Status | Notes |
 | ------ | -------- | ------ | ----- |
