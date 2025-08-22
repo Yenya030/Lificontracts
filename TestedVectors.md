@@ -20,6 +20,16 @@
 - Tool: `slither`
 - Result: Uses low-level calls to transfer ETH to arbitrary receiver, allowing reentrancy before event emission.
 
+## ERC20Proxy arbitrary token transfer
+- Severity: High
+- Test: `forge test --match-path test/solidity/Security/ERC20ProxyArbitraryFrom.t.sol`
+- Result: Authorized callers can move tokens from any approved address, enabling theft if proxy is approved by victims.
+
+## LidoWrapper sweeps existing stETH balance
+- Severity: Medium
+- Test: `forge test --match-path test/solidity/Security/LidoWrapperSweep.t.sol`
+- Result: `wrapStETHToWstETH` unwraps entire contract balance, letting callers steal stray stETH deposits.
+
 | Date | Description | Severity | Result |
 |------|-------------|----------|--------|
 | 2025-02-14 | Unauthorized PancakeV3 swap callback invocation | High | Reverted with `UniswapV3SwapCallbackUnknownSource` |
