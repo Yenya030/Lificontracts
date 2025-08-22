@@ -28,3 +28,4 @@
 | Vector | Severity | Status | Notes |
 | ------ | -------- | ------ | ----- |
 | Using zero address as receiver in swapTokensGeneric | Medium | Mitigated | Reverts with InvalidReceiver; covered by test |
+| Unauthorized transferFrom in LibAsset.transferFromERC20 | Medium | Mitigated | Reverts without prior approval; covered by test |

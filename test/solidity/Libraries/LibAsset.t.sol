@@ -113,6 +113,17 @@ contract LibAssetTest is TestBase {
         );
     }
 
+    function testRevert_transferFromERC20WithoutApproval() public {
+        vm.expectRevert();
+
+        implementer.transferFromERC20(
+            ADDRESS_USDC,
+            USER_SENDER,
+            payable(makeAddr("Bob")),
+            defaultUSDCAmount
+        );
+    }
+
     function testRevert_depositZeroAmount() public {
         vm.expectRevert(InvalidAmount.selector);
 
