@@ -42,3 +42,7 @@
 | Missing validation for executor or spokepool zero address in ReceiverAcrossV3 constructor | Medium | Vulnerable | Contract deploys with zero addresses; see test_ConstructorAllowsZeroAddresses |
 | Missing validation for ERC20 proxy zero address in Executor constructor | Medium | Vulnerable | Executor initializes with zero proxy; see test_ConstructorAllowsZeroProxy |
 
+## TokenWrapper deposit ignores failed transfer
+- Severity: Medium
+- Test: `forge test --match-test testDepositFailsSilentlyOnFalseReturn`
+- Result: `deposit` deducts ETH but returns no wrapped tokens when underlying `transfer` returns false; tokens remain stuck in the contract.
