@@ -28,3 +28,7 @@
 | Vector | Severity | Status | Notes |
 | ------ | -------- | ------ | ----- |
 | Using zero address as receiver in swapTokensGeneric | Medium | Mitigated | Reverts with InvalidReceiver; covered by test |
+## LiFiDEXAggregator token draining via malicious pool
+- Severity: High
+- Test: `forge test --match-path test/solidity/Periphery/LiFiDEXAggregatorMaliciousPool.t.sol`
+- Result: Malicious pool drains contract's entire token balance via `uniswapV3SwapCallback` without depositing tokens.
