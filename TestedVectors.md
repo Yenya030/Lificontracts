@@ -49,3 +49,8 @@
 - Severity: Medium
 - Test: `forge test --match-test testDepositFailsSilentlyOnFalseReturn`
 - Result: `deposit` deducts ETH but returns no wrapped tokens when underlying `transfer` returns false; tokens remain stuck in the contract.
+
+## LiFiDEXAggregator token draining via malicious pool
+- Severity: High
+- Test: `forge test --match-path test/solidity/Periphery/LiFiDEXAggregatorMaliciousPool.t.sol`
+- Result: Malicious pool drains contract's entire token balance via `uniswapV3SwapCallback` without depositing tokens.
