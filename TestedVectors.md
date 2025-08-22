@@ -20,12 +20,30 @@
 - Tool: `slither`
 - Result: Uses low-level calls to transfer ETH to arbitrary receiver, allowing reentrancy before event emission.
 
+## ERC20Proxy arbitrary token transfer
+- Severity: High
+- Test: `forge test --match-path test/solidity/Security/ERC20ProxyArbitraryFrom.t.sol`
+- Result: Authorized callers can move tokens from any approved address, enabling theft if proxy is approved by victims.
+
+## LidoWrapper sweeps existing stETH balance
+- Severity: Medium
+- Test: `forge test --match-path test/solidity/Security/LidoWrapperSweep.t.sol`
+- Result: `wrapStETHToWstETH` unwraps entire contract balance, letting callers steal stray stETH deposits.
+
 | Date | Description | Severity | Result |
 |------|-------------|----------|--------|
 | 2025-02-14 | Unauthorized PancakeV3 swap callback invocation | High | Reverted with `UniswapV3SwapCallbackUnknownSource` |
 | 2025-02-14 | Zero or negative amount in PancakeV3 swap callback | Medium | Reverted with `UniswapV3SwapCallbackNotPositiveAmount` |
+| Permit2 witness call executed by third party | Medium | Mitigated | Execution by unsignatured caller still honors witness; verified with `forge test --match-test test_can_call_diamond_with_permit2_plus_witness` |
+| EIP-7702 delegated account misclassified as EOA | Medium | Mitigated | `LibAsset.isContract` returns false for 23-byte accounts, preventing contract-only interactions; verified with `forge test --match-test test_isContractWithDelegationDesignator` |\
 | 2025-08-22 | Reentrancy during token transfer triggers PancakeV3 callback | High | Reverted with `UniswapV3SwapCallbackUnknownSource` |
-
 | Vector | Severity | Status | Notes |
 | ------ | -------- | ------ | ----- |
 | Using zero address as receiver in swapTokensGeneric | Medium | Mitigated | Reverts with InvalidReceiver; covered by test |
+| Missing validation for executor or spokepool zero address in ReceiverAcrossV3 constructor | Medium | Vulnerable | Contract deploys with zero addresses; see test_ConstructorAllowsZeroAddresses |
+| Missing validation for ERC20 proxy zero address in Executor constructor | Medium | Vulnerable | Executor initializes with zero proxy; see test_ConstructorAllowsZeroProxy |
+
+## TokenWrapper deposit ignores failed transfer
+- Severity: Medium
+- Test: `forge test --match-test testDepositFailsSilentlyOnFalseReturn`
+- Result: `deposit` deducts ETH but returns no wrapped tokens when underlying `transfer` returns false; tokens remain stuck in the contract.
