@@ -208,6 +208,13 @@ contract LiFiTimelockControllerTest is Test {
         vm.stopPrank();
     }
 
+    function test_SetDiamondAddressAllowsZero() public {
+        vm.startPrank(admin);
+        timelock.setDiamondAddress(address(0));
+        assertEq(timelock.diamond(), address(0));
+        vm.stopPrank();
+    }
+
     function test_UnpauseDiamondWithBlacklist() public {
         vm.startPrank(admin);
 

@@ -1,5 +1,6 @@
 
 
+
 # Tested Vectors
 
 ## Patcher Deposit Token Theft
@@ -199,3 +200,9 @@
 - Severity: Medium
 - Test: `forge test --match-path test/solidity/Security/GenericSwapFacetV3ZeroReceiver.t.sol`
 - Result: `swapTokensSingleV3ERC20ToNative` accepts `address(0)` as receiver, sending the contract's ETH balance to the zero address and permanently burning the funds.
+
+
+## LiFiTimelockController zero diamond address
+- Severity: Medium (privileged)
+- Test: `forge test --match-path test/solidity/Security/LiFiTimelockController.t.sol --match-test test_SetDiamondAddressAllowsZero`
+- Result: Admin can set `diamond` to `address(0)`, potentially disabling timelock functions; requires `TIMELOCK_ADMIN_ROLE` so not exploitable by unprivileged users.
