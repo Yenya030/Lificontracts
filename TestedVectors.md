@@ -50,6 +50,11 @@
 - Test: `forge test --match-test testDepositFailsSilentlyOnFalseReturn`
 - Result: `deposit` deducts ETH but returns no wrapped tokens when underlying `transfer` returns false; tokens remain stuck in the contract.
 
+## TokenWrapper withdraw guards against failed transferFrom
+- Severity: Medium
+- Test: `forge test --match-path test/solidity/Periphery/TokenWrapper.t.sol --match-test testWithdrawRevertsOnFalseTransferFrom`
+- Result: `withdraw` reverts when the wrapped token's `transferFrom` returns false, preventing ETH release without token transfer.
+
 ## LiFiDEXAggregator token draining via malicious pool
 - Severity: High
 - Test: `forge test --match-path test/solidity/Periphery/LiFiDEXAggregatorMaliciousPool.t.sol`
