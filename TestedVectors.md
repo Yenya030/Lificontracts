@@ -90,3 +90,7 @@
 - Severity: Medium
 - Test: `forge test --match-test testZeroAddressIntegratorLocksFees`
 - Result: Fees collected for `integratorAddress` set to `address(0)` cannot be withdrawn and remain locked in the contract.
+## RelayFacet startBridgeTokensViaRelay reentrancy
+- Severity: High
+- Test: `forge test --match-path test/solidity/Security/RelayFacetReentrancyStart.t.sol`
+- Result: Reentrancy attempt reverted; `ReentrancyGuard` prevents reuse of request IDs before `consumedIds` update.
