@@ -160,3 +160,8 @@
 - Severity: Medium
 - Test: `forge test --match-path test/solidity/Security/CBridgeFacetZero.t.sol`
 - Result: Contract deploys with `cBridge` set to zero, causing bridge calls to send funds to the zero address and render the facet unusable.
+
+## CelerCircleBridgeFacet constructor allows zero addresses
+- Severity: Medium
+- Test: `forge test --match-path test/solidity/Security/CelerCircleBridgeFacetZero.t.sol`
+- Result: Contract deploys with zero `circleBridgeProxy` and `usdc` addresses; calls to `startBridgeTokensViaCelerCircleBridge` succeed but leave tokens stuck in the contract.
