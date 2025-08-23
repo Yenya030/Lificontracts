@@ -175,3 +175,13 @@
 - Severity: Medium
 - Test: `forge test --match-path test/solidity/Security/ThorSwapFacetZero.t.sol`
 - Result: Contract deploys with router set to zero, causing bridge attempts to revert and preventing token swaps.
+
+## SquidFacet constructor allows zero router address
+- Severity: Medium
+- Test: `forge test --match-path test/solidity/Security/SquidFacetZero.t.sol`
+- Result: Contract deploys with `_squidRouter` set to zero; subsequent bridge calls revert, leaving the facet unusable.
+
+## ChainflipFacet constructor rejects zero vault address
+- Severity: Medium
+- Test: `forge test --match-path test/solidity/Security/ChainflipFacetZero.t.sol`
+- Result: Deployment with `_chainflipVa
