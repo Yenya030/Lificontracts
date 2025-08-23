@@ -101,3 +101,8 @@
 - Severity: Medium
 - Test: `forge test --match-path test/solidity/Security/Permit2ProxyZero.t.sol`
 - Result: Contract deploys with zero LIFI diamond, Permit2, and owner addresses, risking misconfiguration and locked funds.
+
+## GasZipPeriphery constructor allows zero addresses
+- Severity: Medium
+- Test: `forge test --match-path test/solidity/Security/GasZipPeripheryZero.t.sol`
+- Result: Contract deploys with zero `gasZipRouter` and `liFiDEXAggregator`, leaving operations unusable and risking fund lockup.
