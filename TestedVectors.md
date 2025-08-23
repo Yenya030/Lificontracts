@@ -240,3 +240,8 @@
 - Severity: Medium
 - Test: `forge test --match-path test/solidity/Security/PioneerFacetZero.t.sol`
 - Result: Constructor reverts on zero `_pioneerAddress` and bridging reverts when `refundAddress` is zero, preventing unauthorized refunds or misconfiguration.
+
+## Patcher leftover ETH can be stolen
+- Severity: High
+- Test: `forge test --match-path test/solidity/Periphery/PatcherEthDrain.t.sol`
+- Result: Excess ETH sent to `Patcher` remains in the contract and can be drained by anyone through `executeWithDynamicPatches`.
