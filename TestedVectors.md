@@ -40,6 +40,8 @@
 | 2025-08-22 | Unauthorized Algebra swap callback invocation | High | Reverted with `UniswapV3SwapCallbackUnknownSource` |
 | 2025-08-22 | Zero or negative amount in Algebra swap callback | Medium | Reverted with `UniswapV3SwapCallbackNotPositiveAmount` |
 | 2025-08-22 | Reentrancy during token transfer triggers Algebra swap callback | High | Reverted with `UniswapV3SwapCallbackUnknownSource` |
+| 2025-08-23 | Unauthorized RamsesV2 swap callback invocation | High | Reverted with `UniswapV3SwapCallbackUnknownSource` |
+| 2025-08-23 | Zero or negative amount in RamsesV2 swap callback | Medium | Reverted with `UniswapV3SwapCallbackNotPositiveAmount` |
 | Vector | Severity | Status | Notes |
 | ------ | -------- | ------ | ----- |
 | Using zero address as receiver in swapTokensGeneric | Medium | Mitigated | Reverts with InvalidReceiver; covered by test |
