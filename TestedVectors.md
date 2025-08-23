@@ -85,3 +85,8 @@
 - Severity: High
 - Test: `forge test --match-path test/solidity/Periphery/LiFiDEXAggregatorTransferValueDrain.t.sol`
 - Result: Function transfers arbitrary ETH amount from contract balance before verifying `msg.value`, allowing attackers to drain stored ETH.
+
+## FeeCollector zero-address integrator locks fees
+- Severity: Medium
+- Test: `forge test --match-test testZeroAddressIntegratorLocksFees`
+- Result: Fees collected for `integratorAddress` set to `address(0)` cannot be withdrawn and remain locked in the contract.
