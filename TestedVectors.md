@@ -69,3 +69,8 @@
 - Severity: High
 - Test: `forge test --match-path test/solidity/Security/GasZipPeripheryReentrancy.t.sol`
 - Result: Malicious GasZip router can reenter `depositToGasZipNative` and siphon the contract's ETH balance.
+
+## GasZipPeriphery public deposit drains contract ETH
+- **Severity**: Medium
+- **Test**: `forge test --match-path test/solidity/Security/GasZipPeripheryDrainNative.t.sol`
+- **Result**: Anyone can call `depositToGasZipNative` with zero `msg.value` to forward the contract\x27s ETH balance to an arbitrary `receiverAddress`, draining stuck native tokens.
