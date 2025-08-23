@@ -1,3 +1,6 @@
+
+
+
 # Tested Vectors
 
 ## Patcher Deposit Token Theft
@@ -165,6 +168,39 @@
 - Severity: Medium
 - Test: `forge test --match-path test/solidity/Security/CelerCircleBridgeFacetZero.t.sol`
 - Result: Contract deploys with zero `circleBridgeProxy` and `usdc` addresses; calls to `startBridgeTokensViaCelerCircleBridge` succeed but leave tokens stuck in the contract.
+
+## OptimismBridgeFacet initialization allows zero standard bridge
+- Severity: Medium
+- Test: `forge test --match-path test/solidity/Security/OptimismBridgeFacetZeroStandardBridge.t.sol`
+- Result: `initOptimism` accepts `standardBridge` as address(0); subsequent bridge attempts revert with "call to non-contract address", leaving the facet unusable.
+
+## ThorSwapFacet constructor allows zero router address
+- Severity: Medium
+- Test: `forge test --match-path test/solidity/Security/ThorSwapFacetZero.t.sol`
+- Result: Contract deploys with router set to zero, causing bridge attempts to revert and preventing token swaps.
+
+## SquidFacet constructor allows zero router address
+- Severity: Medium
+- Test: `forge test --match-path test/solidity/Security/SquidFacetZero.t.sol`
+- Result: Contract deploys with `_squidRouter` set to zero; subsequent bridge calls revert, leaving the facet unusable.
+
+## ChainflipFacet constructor rejects zero vault address
+- Severity: Medium
+- Test: `forge test --match-path test/solidity/Security/ChainflipFacetZero.t.sol`
+- Result: Deployment with `_chainflipVa
+
+
+## CBridgeFacetPacked constructor allows zero cBridge address
+- Severity: Medium
+- Test: `forge test --match-path test/solidity/Security/CBridgeFacetPackedZero.t.sol`
+- Result: Contract deploys with `cBridge` set to zero, causing bridge calls to revert and leaving operations unusable.
+
+
+## GenericSwapFacetV3 zero receiver burns native tokens
+- Severity: Medium
+- Test: `forge test --match-path test/solidity/Security/GenericSwapFacetV3ZeroReceiver.t.sol`
+- Result: `swapTokensSingleV3ERC20ToNative` accepts `address(0)` as receiver, sending the contract's ETH balance to the zero address and permanently burning the funds.
+
 
 ## LiFiTimelockController zero diamond address
 - Severity: Medium (privileged)
