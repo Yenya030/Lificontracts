@@ -245,3 +245,8 @@
 - Severity: High
 - Test: `forge test --match-path test/solidity/Periphery/PatcherEthDrain.t.sol`
 - Result: Excess ETH sent to `Patcher` remains in the contract and can be drained by anyone through `executeWithDynamicPatches`.
+
+## GlacisFacet unlimited token allowance to airlift
+- Severity: High
+- Test: `forge test --match-path test/solidity/Security/GlacisFacetAllowance.t.sol`
+- Result: Leaves unlimited ERC20 allowance to the airlift contract, enabling token drain via `transferFrom` if the airlift is compromised.
