@@ -135,3 +135,7 @@
 - Severity: Medium
 - Test: `forge test --match-path test/solidity/Security/AcrossFacetPackedV3Zero.t.sol`
 - Result: Contract deploys with zero `spokePool` and `wrappedNative`, leading to misconfiguration and potential fund loss.
+## CBridgeFacet constructor allows zero cBridge address
+- Severity: Medium
+- Test: `forge test --match-path test/solidity/Security/CBridgeFacetZero.t.sol`
+- Result: Contract deploys with `cBridge` set to zero, causing bridge calls to send funds to the zero address and render the facet unusable.
