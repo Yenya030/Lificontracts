@@ -59,3 +59,8 @@
 - Severity: Medium
 - Test: `forge test --match-path test/solidity/Security/ExecutorReentrancy.t.sol`
 - Result: Reentrancy attempt reverts with `ReentrancyError`, blocking nested swap execution.
+
+## TokenWrapper withdraw guards against failed transferFrom
+- Severity: Medium
+- Test: `forge test --match-path test/solidity/Periphery/TokenWrapper.t.sol --match-test testWithdrawRevertsOnFalseTransferFrom`
+- Result: `withdraw` reverts when the wrapped token's `transferFrom` returns false, preventing ETH release without token transfer.
