@@ -90,3 +90,13 @@
 - Severity: Medium
 - Test: `forge test --match-test testZeroAddressIntegratorLocksFees`
 - Result: Fees collected for `integratorAddress` set to `address(0)` cannot be withdrawn and remain locked in the contract.
+## ReceiverStargateV2 constructor allows zero addresses
+- Severity: Medium
+- Test: `forge test --match-path test/solidity/Security/ReceiverStargateV2Zero.t.sol`
+- Result: Contract deploys with zero executor, tokenMessaging, and endpoint addresses, leaving the receiver misconfigured and unusable.
+
+## Permit2Proxy constructor allows zero addresses
+- Severity: Medium
+- Test: `forge test --match-path test/solidity/Security/Permit2ProxyZero.t.sol`
+- Result: Contract deploys with zero LIFI diamond, Permit2, and owner addresses, risking misconfiguration and locked funds.
+
