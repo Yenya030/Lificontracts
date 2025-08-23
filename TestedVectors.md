@@ -54,3 +54,7 @@
 - Severity: High
 - Test: `forge test --match-path test/solidity/Periphery/LiFiDEXAggregatorMaliciousPool.t.sol`
 - Result: Malicious pool drains contract's entire token balance via `uniswapV3SwapCallback` without depositing tokens.
+## LiFiDEXAggregator ETH drain via transferValueAndprocessRoute
+- Severity: High
+- Test: `forge test --match-path test/solidity/Periphery/LiFiDEXAggregatorTransferValueDrain.t.sol`
+- Result: Function transfers arbitrary ETH amount from contract balance before verifying `msg.value`, allowing attackers to drain stored ETH.
