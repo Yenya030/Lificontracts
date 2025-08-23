@@ -54,6 +54,32 @@
 - Severity: High
 - Test: `forge test --match-path test/solidity/Periphery/LiFiDEXAggregatorMaliciousPool.t.sol`
 - Result: Malicious pool drains contract's entire token balance via `uniswapV3SwapCallback` without depositing tokens.
+
+## Executor swap reentrancy via malicious swap adapter
+- Severity: Medium
+- Test: `forge test --match-path test/solidity/Security/ExecutorReentrancy.t.sol`
+- Result: Reentrancy attempt reverts with `ReentrancyError`, blocking nested swap execution.
+
+## TokenWrapper withdraw guards against failed transferFrom
+- Severity: Medium
+- Test: `forge test --match-path test/solidity/Periphery/TokenWrapper.t.sol --match-test testWithdrawRevertsOnFalseTransferFrom`
+- Result: `withdraw` reverts when the wrapped token's `transferFrom` returns false, preventing ETH release without token transfer.
+
+## GasZipPeriphery deposit reentrancy drains funds
+- Severity: High
+- Test: `forge test --match-path test/solidity/Security/GasZipPeripheryReentrancy.t.sol`
+- Result: Malicious GasZip router can reenter `depositToGasZipNative` and siphon the contract's ETH balance.
+
+## GasZipPeriphery public deposit drains contract ETH
+- **Severity**: Medium
+- **Test**: `forge test --match-path test/solidity/Security/GasZipPeripheryDrainNative.t.sol`
+- **Result**: Anyone can call `depositToGasZipNative` with zero `msg.value` to forward the contract\x27s ETH balance to an arbitrary `receiverAddress`, draining stuck native tokens.
+
+## LiFiDEXAggregator constructor allows zero BentoBox address
+- Severity: Medium
+- Test: `forge test --match-path test/solidity/Security/LiFiDexAggregatorZero.t.sol`
+- Result: Deployer can set `BENTO_BOX` to the zero address, leaving the aggregator unusable and risking token lockup.
+
 ## LiFiDEXAggregator ETH drain via transferValueAndprocessRoute
 - Severity: High
 - Test: `forge test --match-path test/solidity/Periphery/LiFiDEXAggregatorTransferValueDrain.t.sol`
