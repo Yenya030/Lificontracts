@@ -74,3 +74,8 @@
 - **Severity**: Medium
 - **Test**: `forge test --match-path test/solidity/Security/GasZipPeripheryDrainNative.t.sol`
 - **Result**: Anyone can call `depositToGasZipNative` with zero `msg.value` to forward the contract\x27s ETH balance to an arbitrary `receiverAddress`, draining stuck native tokens.
+
+## LiFiDEXAggregator constructor allows zero BentoBox address
+- Severity: Medium
+- Test: `forge test --match-path test/solidity/Security/LiFiDexAggregatorZero.t.sol`
+- Result: Deployer can set `BENTO_BOX` to the zero address, leaving the aggregator unusable and risking token lockup.
