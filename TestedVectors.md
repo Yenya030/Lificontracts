@@ -106,3 +106,8 @@
 - Severity: Medium
 - Test: `forge test --match-path test/solidity/Security/GasZipPeripheryZero.t.sol`
 - Result: Contract deploys with zero `gasZipRouter` and `liFiDEXAggregator`, leaving operations unusable and risking fund lockup.
+
+## RelayFacet startBridgeTokensViaRelay reentrancy
+- Severity: High
+- Test: `forge test --match-path test/solidity/Security/RelayFacetReentrancyStart.t.sol`
+- Result: Reentrancy attempt reverted; `ReentrancyGuard` prevents reuse of request IDs before `consumedIds` update.
