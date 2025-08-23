@@ -165,3 +165,8 @@
 - Severity: Medium
 - Test: `forge test --match-path test/solidity/Security/CelerCircleBridgeFacetZero.t.sol`
 - Result: Contract deploys with zero `circleBridgeProxy` and `usdc` addresses; calls to `startBridgeTokensViaCelerCircleBridge` succeed but leave tokens stuck in the contract.
+
+## LiFiTimelockController zero diamond address
+- Severity: Medium (privileged)
+- Test: `forge test --match-path test/solidity/Security/LiFiTimelockController.t.sol --match-test test_SetDiamondAddressAllowsZero`
+- Result: Admin can set `diamond` to `address(0)`, potentially disabling timelock functions; requires `TIMELOCK_ADMIN_ROLE` so not exploitable by unprivileged users.
