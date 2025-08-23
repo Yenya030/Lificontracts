@@ -116,3 +116,7 @@
 - Severity: Medium
 - Test: `forge test --match-path test/solidity/Security/ExecutorLeftover.t.sol`
 - Result: Excess input tokens are returned to the receiver, leaving no balance in `Executor`.
+## AcrossFacetPackedV3 constructor allows zero addresses
+- Severity: Medium
+- Test: `forge test --match-path test/solidity/Security/AcrossFacetPackedV3Zero.t.sol`
+- Result: Contract deploys with zero `spokePool` and `wrappedNative`, leading to misconfiguration and potential fund loss.
