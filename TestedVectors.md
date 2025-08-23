@@ -90,3 +90,7 @@
 - Severity: Medium
 - Test: `forge test --match-test testZeroAddressIntegratorLocksFees`
 - Result: Fees collected for `integratorAddress` set to `address(0)` cannot be withdrawn and remain locked in the contract.
+## Permit2Proxy constructor allows zero addresses
+- Severity: Medium
+- Test: `forge test --match-path test/solidity/Security/Permit2ProxyZero.t.sol`
+- Result: Contract deploys with zero `LIFI_DIAMOND`, `PERMIT2`, and `owner`, enabling misconfiguration and potential asset lockup.
