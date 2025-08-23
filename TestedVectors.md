@@ -150,3 +150,8 @@
 - Severity: Medium
 - Test: `forge test --match-path test/solidity/Security/ArbitrumBridgeFacetZero.t.sol`
 - Result: Contract deploys with zero `gatewayRouter` and `inbox`, causing bridge initiation to revert.
+
+## ReceiverChainflip allowance resets after execution
+- Severity: Medium
+- Test: `forge test --match-path test/solidity/Security/ReceiverChainflipAllowance.t.sol`
+- Result: After a successful `cfReceive` call, the token allowance granted to `Executor` drops to zero, leaving no residual approval for later misuse.
