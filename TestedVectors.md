@@ -170,3 +170,8 @@
 - Severity: Medium
 - Test: `forge test --match-path test/solidity/Security/OptimismBridgeFacetZeroStandardBridge.t.sol`
 - Result: `initOptimism` accepts `standardBridge` as address(0); subsequent bridge attempts revert with "call to non-contract address", leaving the facet unusable.
+
+## ThorSwapFacet constructor allows zero router address
+- Severity: Medium
+- Test: `forge test --match-path test/solidity/Security/ThorSwapFacetZero.t.sol`
+- Result: Contract deploys with router set to zero, causing bridge attempts to revert and preventing token swaps.
