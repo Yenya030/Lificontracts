@@ -250,3 +250,8 @@
 - Severity: High
 - Test: `forge test --match-path test/solidity/Security/GlacisFacetAllowance.t.sol`
 - Result: Leaves unlimited ERC20 allowance to the airlift contract, enabling token drain via `transferFrom` if the airlift is compromised.
+
+## AllBridgeFacet constructor rejects zero router address
+- Severity: Medium
+- Test: `forge test --match-path test/solidity/Security/AllBridgeFacetZero.t.sol`
+- Result: Deployment with `_allBridge` set to `address(0)` reverts with `InvalidConfig`, preventing misconfiguration and potential fund lockup.
