@@ -1,4 +1,5 @@
 
+
 # Tested Vectors
 
 ## Patcher Deposit Token Theft
@@ -192,3 +193,9 @@
 - Severity: Medium
 - Test: `forge test --match-path test/solidity/Security/CBridgeFacetPackedZero.t.sol`
 - Result: Contract deploys with `cBridge` set to zero, causing bridge calls to revert and leaving operations unusable.
+
+
+## GenericSwapFacetV3 zero receiver burns native tokens
+- Severity: Medium
+- Test: `forge test --match-path test/solidity/Security/GenericSwapFacetV3ZeroReceiver.t.sol`
+- Result: `swapTokensSingleV3ERC20ToNative` accepts `address(0)` as receiver, sending the contract's ETH balance to the zero address and permanently burning the funds.
