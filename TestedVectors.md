@@ -265,3 +265,8 @@
 - Severity: Medium
 - Test: `forge test --match-path test/solidity/Security/GlacisFacetZero.t.sol`
 - Result: Deployment with zero airlift address or zero refund address reverts, preventing misconfiguration and locked funds.
+
+## GlacisFacet zero refund address
+- Severity: Medium
+- Test: `forge test --match-path test/solidity/Security/GlacisFacetZeroRefundAddress.t.sol`
+- Result: `_startBridge` reverts with `InvalidRefundAddress` when `refundAddress` is zero, preventing misconfiguration.
