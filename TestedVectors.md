@@ -79,3 +79,8 @@
 - Severity: Medium
 - Test: `forge test --match-path test/solidity/Security/LiFiDexAggregatorZero.t.sol`
 - Result: Deployer can set `BENTO_BOX` to the zero address, leaving the aggregator unusable and risking token lockup.
+
+## LiFiDEXAggregator ETH drain via transferValueAndprocessRoute
+- Severity: High
+- Test: `forge test --match-path test/solidity/Periphery/LiFiDEXAggregatorTransferValueDrain.t.sol`
+- Result: Function transfers arbitrary ETH amount from contract balance before verifying `msg.value`, allowing attackers to drain stored ETH.
