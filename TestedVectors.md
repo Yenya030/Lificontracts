@@ -135,3 +135,7 @@
 - Severity: Medium
 - Test: `forge test --match-path test/solidity/Security/AcrossFacetPackedV3Zero.t.sol`
 - Result: Contract deploys with zero `spokePool` and `wrappedNative`, leading to misconfiguration and potential fund loss.
+## ReceiverChainflip allowance resets after execution
+- Severity: Medium
+- Test: `forge test --match-path test/solidity/Security/ReceiverChainflipAllowance.t.sol`
+- Result: After a successful `cfReceive` call, the token allowance granted to `Executor` drops to zero, leaving no residual approval for later misuse.
