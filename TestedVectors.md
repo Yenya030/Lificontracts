@@ -206,3 +206,7 @@
 - Severity: Medium (privileged)
 - Test: `forge test --match-path test/solidity/Security/LiFiTimelockController.t.sol --match-test test_SetDiamondAddressAllowsZero`
 - Result: Admin can set `diamond` to `address(0)`, potentially disabling timelock functions; requires `TIMELOCK_ADMIN_ROLE` so not exploitable by unprivileged users.
+## GnosisBridgeFacet constructor rejects zero router address
+- Severity: Medium
+- Test: `forge test --match-path test/solidity/Security/GnosisBridgeFacetZero.t.sol`
+- Result: Deployment with `_gnosisBridgeRouter` set to `address(0)` reverts with `InvalidConfig`, preventing misconfiguration.
