@@ -165,3 +165,8 @@
 - Severity: Medium
 - Test: `forge test --match-path test/solidity/Security/CelerCircleBridgeFacetZero.t.sol`
 - Result: Contract deploys with zero `circleBridgeProxy` and `usdc` addresses; calls to `startBridgeTokensViaCelerCircleBridge` succeed but leave tokens stuck in the contract.
+
+## ThorSwapFacet constructor allows zero router address
+- Severity: Medium
+- Test: `forge test --match-path test/solidity/Security/ThorSwapFacetZero.t.sol`
+- Result: Contract deploys with router set to zero, causing bridge attempts to revert and preventing token swaps.
