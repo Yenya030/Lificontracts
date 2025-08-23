@@ -224,3 +224,7 @@
 - Severity: Medium
 - Test: `forge test --match-path test/solidity/Security/GnosisBridgeFacetZero.t.sol`
 - Result: Deployment with `_gnosisBridgeRouter` set to `address(0)` reverts with `InvalidConfig`, preventing misconfiguration.
+## EmergencyPauseFacet constructor allows zero pauser wallet
+- Severity: Medium
+- Test: `forge test --match-path test/solidity/Security/EmergencyPauseFacetZero.t.sol`
+- Result: Contract deploys with `pauserWallet` set to the zero address, leaving emergency pause and facet removal restricted only to the owner.
