@@ -5,7 +5,7 @@ import { DSTest } from "ds-test/test.sol";
 import { Vm } from "forge-std/Vm.sol";
 import { FeeCollector } from "lifi/Periphery/FeeCollector.sol";
 import { TestToken as ERC20 } from "../utils/TestToken.sol";
-import { UnAuthorized } from "lifi/Errors/GenericErrors.sol";
+import { UnAuthorized, InvalidReceiver } from "lifi/Errors/GenericErrors.sol";
 
 contract FeeCollectorTest is DSTest {
     // solhint-disable immutable-vars-naming
@@ -69,6 +69,25 @@ contract FeeCollectorTest is DSTest {
                 integratorFee
         );
         assert(feeCollector.getLifiTokenBalance(address(0)) == lifiFee);
+    }
+
+    function testZeroAddressIntegratorLocksFees() public {
+        uint256 integratorFee = 1 ether;
+
+        feeCollector.collectNativeFees{ value: integratorFee }(
+            integratorFee,
+            0,
+            address(0)
+        );
+
+        vm.prank(address(0));
+        vm.expectRevert(InvalidReceiver.selector);
+        feeCollector.withdrawIntegratorFees(address(0));
+
+        assert(
+            feeCollector.getTokenBalance(address(0), address(0)) ==
+                integratorFee
+        );
     }
 
     function testCanWithdrawIntegratorFees() public {

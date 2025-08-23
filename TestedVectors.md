@@ -54,3 +54,8 @@
 - Severity: High
 - Test: `forge test --match-path test/solidity/Periphery/LiFiDEXAggregatorMaliciousPool.t.sol`
 - Result: Malicious pool drains contract's entire token balance via `uniswapV3SwapCallback` without depositing tokens.
+
+## FeeCollector zero-address integrator locks fees
+- Severity: Medium
+- Test: `forge test --match-test testZeroAddressIntegratorLocksFees`
+- Result: Fees collected for `integratorAddress` set to `address(0)` cannot be withdrawn and remain locked in the contract.
