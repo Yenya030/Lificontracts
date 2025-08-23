@@ -54,3 +54,7 @@
 - Severity: High
 - Test: `forge test --match-path test/solidity/Periphery/LiFiDEXAggregatorMaliciousPool.t.sol`
 - Result: Malicious pool drains contract's entire token balance via `uniswapV3SwapCallback` without depositing tokens.
+## LiFiDEXAggregator constructor allows zero BentoBox address
+- Severity: Medium
+- Test: `forge test --match-path test/solidity/Security/LiFiDexAggregatorZero.t.sol`
+- Result: Deployer can set `BENTO_BOX` to the zero address, leaving the aggregator unusable and risking token lockup.
