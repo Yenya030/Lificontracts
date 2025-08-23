@@ -116,3 +116,7 @@
 - Severity: Medium
 - Test: `forge test --match-path test/solidity/Security/ExecutorLeftover.t.sol`
 - Result: Excess input tokens are returned to the receiver, leaving no balance in `Executor`.
+## GenericSwapFacetV3 single-swap zero receiver burns tokens
+- Severity: Medium
+- Test: `forge test --match-path test/solidity/Security/GenericSwapFacetV3ZeroReceiver.t.sol`
+- Result: Passing zero receiver causes leftover tokens to be sent to address(0), permanently burning the funds.
