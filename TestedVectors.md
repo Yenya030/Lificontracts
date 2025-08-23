@@ -54,3 +54,8 @@
 - Severity: High
 - Test: `forge test --match-path test/solidity/Periphery/LiFiDEXAggregatorMaliciousPool.t.sol`
 - Result: Malicious pool drains contract's entire token balance via `uniswapV3SwapCallback` without depositing tokens.
+
+## Executor swap reentrancy via malicious swap adapter
+- Severity: Medium
+- Test: `forge test --match-path test/solidity/Security/ExecutorReentrancy.t.sol`
+- Result: Reentrancy attempt reverts with `ReentrancyError`, blocking nested swap execution.
