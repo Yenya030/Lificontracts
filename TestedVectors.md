@@ -206,3 +206,17 @@
 - Severity: Medium (privileged)
 - Test: `forge test --match-path test/solidity/Security/LiFiTimelockController.t.sol --match-test test_SetDiamondAddressAllowsZero`
 - Result: Admin can set `diamond` to `address(0)`, potentially disabling timelock functions; requires `TIMELOCK_ADMIN_ROLE` so not exploitable by unprivileged users.
+## OmniBridgeFacet constructor allows zero addresses
+- Severity: Medium
+- Test: `forge test --match-path test/solidity/Security/OmniBridgeFacetZero.t.sol`
+- Result: Contract deploys with zero `foreignOmniBridge` and `wethOmniBridge` addresses, causing bridge calls to revert and leaving the facet unusable.
+
+## SymbiosisFacet constructor allows zero addresses
+- Severity: Medium
+- Test: `forge test --match-path test/solidity/Security/SymbiosisFacetZero.t.sol`
+- Result: Contract deploys with zero `symbiosisMetaRouter` and `symbiosisGateway` addresses; bridging attempts revert, rendering the facet inoperable.
+
+## LiFiDiamond constructor allows zero owner
+- Severity: Medium
+- Test: `forge test --match-path test/solidity/Security/LiFiDiamondZero.t.sol`
+- Result: Diamond initializes with owner set to `address(0)`, preventing future upgrades through `diamondCut`.
