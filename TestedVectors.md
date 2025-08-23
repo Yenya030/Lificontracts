@@ -90,3 +90,7 @@
 - Severity: Medium
 - Test: `forge test --match-test testZeroAddressIntegratorLocksFees`
 - Result: Fees collected for `integratorAddress` set to `address(0)` cannot be withdrawn and remain locked in the contract.
+## GasZipPeriphery constructor allows zero addresses
+- Severity: Medium
+- Test: `forge test --match-path test/solidity/Security/GasZipPeripheryZero.t.sol`
+- Result: Contract deploys with zero `gasZipRouter` and `liFiDEXAggregator`, leaving operations unusable and risking fund lockup.
