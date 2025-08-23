@@ -135,6 +135,12 @@
 - Severity: Medium
 - Test: `forge test --match-path test/solidity/Security/AcrossFacetPackedV3Zero.t.sol`
 - Result: Contract deploys with zero `spokePool` and `wrappedNative`, leading to misconfiguration and potential fund loss.
+
+## TokenWrapper constructor rejects zero wrapped token
+- Severity: Medium
+- Test: `forge test --match-path test/solidity/Security/TokenWrapperZeroAddress.t.sol`
+- Result: Deployment with `wrappedToken` set to `address(0)` reverts, preventing misconfiguration.
+
 ## PolygonBridgeFacet constructor allows zero addresses
 - Severity: Medium
 - Test: `forge test --match-path test/solidity/Security/PolygonBridgeFacetZero.t.sol`
@@ -144,4 +150,3 @@
 - Severity: Medium
 - Test: `forge test --match-path test/solidity/Security/ArbitrumBridgeFacetZero.t.sol`
 - Result: Contract deploys with zero `gatewayRouter` and `inbox`, causing bridge initiation to revert.
-
