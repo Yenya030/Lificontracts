@@ -255,3 +255,8 @@
 - Severity: Medium
 - Test: `forge test --match-path test/solidity/Security/AllBridgeFacetZero.t.sol`
 - Result: Deployment with `_allBridge` set to `address(0)` reverts with `InvalidConfig`, preventing misconfiguration and potential fund lockup.
+
+## EmergencyPauseFacet constructor allows zero pauser wallet
+- Severity: Medium
+- Test: `forge test --match-path test/solidity/Security/EmergencyPauseFacetZero.t.sol`
+- Result: Contract deploys with `pauserWallet` set to the zero address, leaving emergency pause and facet removal restricted only to the owner.
