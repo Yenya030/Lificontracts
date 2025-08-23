@@ -54,3 +54,8 @@
 - Severity: High
 - Test: `forge test --match-path test/solidity/Periphery/LiFiDEXAggregatorMaliciousPool.t.sol`
 - Result: Malicious pool drains contract's entire token balance via `uniswapV3SwapCallback` without depositing tokens.
+## GasZipPeriphery public deposit drains contract ETH
+- **Severity**: Medium
+- **Test**: `forge test --match-path test/solidity/Security/GasZipPeripheryDrainNative.t.sol`
+- **Result**: Anyone can call `depositToGasZipNative` with zero `msg.value` to forward the contract\x27s ETH balance to an arbitrary `receiverAddress`, draining stuck native tokens.
+
