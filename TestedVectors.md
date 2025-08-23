@@ -260,3 +260,8 @@
 - Severity: Medium
 - Test: `forge test --match-path test/solidity/Security/EmergencyPauseFacetZero.t.sol`
 - Result: Contract deploys with `pauserWallet` set to the zero address, leaving emergency pause and facet removal restricted only to the owner.
+
+## GlacisFacet constructor and startBridge reject zero addresses
+- Severity: Medium
+- Test: `forge test --match-path test/solidity/Security/GlacisFacetZero.t.sol`
+- Result: Deployment with zero airlift address or zero refund address reverts, preventing misconfiguration and locked funds.
