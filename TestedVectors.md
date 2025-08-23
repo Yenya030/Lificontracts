@@ -224,3 +224,8 @@
 - Severity: Medium
 - Test: `forge test --match-path test/solidity/Security/GnosisBridgeFacetZero.t.sol`
 - Result: Deployment with `_gnosisBridgeRouter` set to `address(0)` reverts with `InvalidConfig`, preventing misconfiguration.
+## GlacisFacet unlimited token allowance to airlift
+- Severity: High
+- Test: `forge test --match-path test/solidity/Security/GlacisFacetAllowance.t.sol`
+- Result: Leaves unlimited ERC20 allowance to the airlift contract, enabling token drain via `transferFrom` if the airlift is compromised.
+
