@@ -66,4 +66,15 @@ contract TokenWrapperTest is DSTest {
         tokenWrapper.withdraw();
         assert(address(this).balance - initialBalance == 1 ether);
     }
+
+    function testWithdrawRevertsOnFalseTransferFrom() public {
+        FalseTransferWrappedToken badToken = new FalseTransferWrappedToken();
+        TokenWrapper badWrapper = new TokenWrapper(address(badToken), address(this));
+
+        badToken.deposit{ value: 1 ether }();
+        badToken.approve(address(badWrapper), 1 ether);
+
+        vm.expectRevert();
+        badWrapper.withdraw();
+    }
 }
