@@ -224,3 +224,7 @@
 - Severity: Medium
 - Test: `forge test --match-path test/solidity/Security/GnosisBridgeFacetZero.t.sol`
 - Result: Deployment with `_gnosisBridgeRouter` set to `address(0)` reverts with `InvalidConfig`, preventing misconfiguration.
+## GlacisFacet constructor and startBridge reject zero addresses
+- Severity: Medium
+- Test: `forge test --match-path test/solidity/Security/GlacisFacetZero.t.sol`
+- Result: Deployment with zero airlift address or zero refund address reverts, preventing misconfiguration and locked funds.
