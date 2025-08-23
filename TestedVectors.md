@@ -224,3 +224,7 @@
 - Severity: Medium
 - Test: `forge test --match-path test/solidity/Security/GnosisBridgeFacetZero.t.sol`
 - Result: Deployment with `_gnosisBridgeRouter` set to `address(0)` reverts with `InvalidConfig`, preventing misconfiguration.
+## AllBridgeFacet constructor rejects zero router address
+- Severity: Medium
+- Test: `forge test --match-path test/solidity/Security/AllBridgeFacetZero.t.sol`
+- Result: Deployment with `_allBridge` set to `address(0)` reverts with `InvalidConfig`, preventing misconfiguration and potential fund lockup.
