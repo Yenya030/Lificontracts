@@ -135,8 +135,33 @@
 - Severity: Medium
 - Test: `forge test --match-path test/solidity/Security/AcrossFacetPackedV3Zero.t.sol`
 - Result: Contract deploys with zero `spokePool` and `wrappedNative`, leading to misconfiguration and potential fund loss.
+
+## TokenWrapper constructor rejects zero wrapped token
+- Severity: Medium
+- Test: `forge test --match-path test/solidity/Security/TokenWrapperZeroAddress.t.sol`
+- Result: Deployment with `wrappedToken` set to `address(0)` reverts, preventing misconfiguration.
+
+## PolygonBridgeFacet constructor allows zero addresses
+- Severity: Medium
+- Test: `forge test --match-path test/solidity/Security/PolygonBridgeFacetZero.t.sol`
+- Result: Contract deploys with zero `rootChainManager` and `erc20Predicate`, causing bridge calls to revert and leaving operations unusable.
+
+## ArbitrumBridgeFacet constructor allows zero addresses
+- Severity: Medium
+- Test: `forge test --match-path test/solidity/Security/ArbitrumBridgeFacetZero.t.sol`
+- Result: Contract deploys with zero `gatewayRouter` and `inbox`, causing bridge initiation to revert.
+
+## ReceiverChainflip allowance resets after execution
+- Severity: Medium
+- Test: `forge test --match-path test/solidity/Security/ReceiverChainflipAllowance.t.sol`
+- Result: After a successful `cfReceive` call, the token allowance granted to `Executor` drops to zero, leaving no residual approval for later misuse.
+
+## CBridgeFacet constructor allows zero cBridge address
+- Severity: Medium
+- Test: `forge test --match-path test/solidity/Security/CBridgeFacetZero.t.sol`
+- Result: Contract deploys with `cBridge` set to zero, causing bridge calls to send funds to the zero address and render the facet unusable.
+
 ## CelerCircleBridgeFacet constructor allows zero addresses
 - Severity: Medium
 - Test: `forge test --match-path test/solidity/Security/CelerCircleBridgeFacetZero.t.sol`
 - Result: Contract deploys with zero `circleBridgeProxy` and `usdc` addresses; calls to `startBridgeTokensViaCelerCircleBridge` succeed but leave tokens stuck in the contract.
-
