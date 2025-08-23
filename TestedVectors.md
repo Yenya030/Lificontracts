@@ -1,6 +1,7 @@
 
 
 
+
 # Tested Vectors
 
 ## Patcher Deposit Token Theft
@@ -210,3 +211,9 @@
 - Severity: Medium
 - Test: `forge test --match-path test/solidity/Security/SymbiosisFacetZero.t.sol`
 - Result: Contract deploys with zero Symbiosis MetaRouter and Gateway addresses, causing bridge calls to revert and leaving the facet unusable.
+
+
+## LiFiDiamond constructor allows zero owner
+- Severity: Medium
+- Test: `forge test --match-path test/solidity/Security/LiFiDiamondZeroOwner.t.sol`
+- Result: Deployment with `_contractOwner` set to `address(0)` succeeds, leaving the diamond without an owner and blocking further upgrades via `diamondCut`.
