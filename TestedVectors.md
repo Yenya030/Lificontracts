@@ -1,4 +1,5 @@
 
+
 # Tested Vectors
 
 ## Patcher Deposit Token Theft
@@ -224,6 +225,37 @@
 - Severity: Medium
 - Test: `forge test --match-path test/solidity/Security/GnosisBridgeFacetZero.t.sol`
 - Result: Deployment with `_gnosisBridgeRouter` set to `address(0)` reverts with `InvalidConfig`, preventing misconfiguration.
+## HopFacetPacked constructor allows zero wrapper and owner
+- Severity: Medium
+- Test: `forge test --match-path test/solidity/Security/HopFacetPackedZero.t.sol`
+- Result: Contract deploys with zero owner and Hop wrapper, leaving bridging addresses unset and potentially causing bridge calls to fail.
+
+
+## DeBridgeDlnFacet constructor rejects zero DLN source address
+- Severity: Medium
+- Test: `forge test --match-path test/solidity/Security/DeBridgeDlnFacetZero.t.sol`
+- Result: Deployment with `_dlnSource` set to `address(0)` reverts with `InvalidConfig`, preventing misconfiguration.
+
+## PioneerFacet zero-address validations
+- Severity: Medium
+- Test: `forge test --match-path test/solidity/Security/PioneerFacetZero.t.sol`
+- Result: Constructor reverts on zero `_pioneerAddress` and bridging reverts when `refundAddress` is zero, preventing unauthorized refunds or misconfiguration.
+
+## Patcher leftover ETH can be stolen
+- Severity: High
+- Test: `forge test --match-path test/solidity/Periphery/PatcherEthDrain.t.sol`
+- Result: Excess ETH sent to `Patcher` remains in the contract and can be drained by anyone through `executeWithDynamicPatches`.
+
+## GlacisFacet unlimited token allowance to airlift
+- Severity: High
+- Test: `forge test --match-path test/solidity/Security/GlacisFacetAllowance.t.sol`
+- Result: Leaves unlimited ERC20 allowance to the airlift contract, enabling token drain via `transferFrom` if the airlift is compromised.
+
+## AllBridgeFacet constructor rejects zero router address
+- Severity: Medium
+- Test: `forge test --match-path test/solidity/Security/AllBridgeFacetZero.t.sol`
+- Result: Deployment with `_allBridge` set to `address(0)` reverts with `InvalidConfig`, preventing misconfiguration and potential fund lockup.
+
 ## EmergencyPauseFacet constructor allows zero pauser wallet
 - Severity: Medium
 - Test: `forge test --match-path test/solidity/Security/EmergencyPauseFacetZero.t.sol`
