@@ -1,4 +1,5 @@
 
+
 # Tested Vectors
 
 ## Patcher Deposit Token Theft
@@ -229,3 +230,13 @@
 - Test: `forge test --match-path test/solidity/Security/HopFacetPackedZero.t.sol`
 - Result: Contract deploys with zero owner and Hop wrapper, leaving bridging addresses unset and potentially causing bridge calls to fail.
 
+
+## DeBridgeDlnFacet constructor rejects zero DLN source address
+- Severity: Medium
+- Test: `forge test --match-path test/solidity/Security/DeBridgeDlnFacetZero.t.sol`
+- Result: Deployment with `_dlnSource` set to `address(0)` reverts with `InvalidConfig`, preventing misconfiguration.
+
+## PioneerFacet zero-address validations
+- Severity: Medium
+- Test: `forge test --match-path test/solidity/Security/PioneerFacetZero.t.sol`
+- Result: Constructor reverts on zero `_pioneerAddress` and bridging reverts when `refundAddress` is zero, preventing unauthorized refunds or misconfiguration.
