@@ -90,3 +90,7 @@
 - Severity: Medium
 - Test: `forge test --match-test testZeroAddressIntegratorLocksFees`
 - Result: Fees collected for `integratorAddress` set to `address(0)` cannot be withdrawn and remain locked in the contract.
+## FeeCollector refund reentrancy during collectNativeFees
+- Severity: Medium
+- Test: `forge test --match-path test/solidity/Security/FeeCollectorReentrancy.t.sol`
+- Result: Reentrant call during refund only withdraws the caller's integrator fees; LiFi fees remain and contract balance is unchanged.
