@@ -90,3 +90,7 @@
 - Severity: Medium
 - Test: `forge test --match-test testZeroAddressIntegratorLocksFees`
 - Result: Fees collected for `integratorAddress` set to `address(0)` cannot be withdrawn and remain locked in the contract.
+## Executor single-swap partial fill refunds leftovers
+- Severity: Medium
+- Test: `forge test --match-path test/solidity/Security/ExecutorLeftover.t.sol`
+- Result: Excess input tokens are returned to the receiver, leaving no balance in `Executor`.
