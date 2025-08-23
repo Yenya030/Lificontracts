@@ -2760,3 +2760,24 @@ contract LiFiDexAggregatorAlgebraCallbackTest is Test {
         liFiDEXAggregator.algebraSwapCallback(0, 0, abi.encode(address(0)));
     }
 }
+contract LiFiDexAggregatorRamsesV2CallbackTest is Test {
+    LiFiDEXAggregator internal liFiDEXAggregator;
+
+    function setUp() public {
+        address[] memory privileged = new address[](1);
+        privileged[0] = address(this);
+        liFiDEXAggregator = new LiFiDEXAggregator(address(0), privileged, address(this));
+    }
+
+    function testRevert_RamsesV2SwapCallbackUnknownSource() public {
+        vm.expectRevert(LiFiDEXAggregator.UniswapV3SwapCallbackUnknownSource.selector);
+        liFiDEXAggregator.ramsesV2SwapCallback(1, 0, abi.encode(address(0)));
+    }
+
+    function testRevert_RamsesV2SwapCallbackNotPositiveAmount() public {
+        vm.store(address(liFiDEXAggregator), bytes32(uint256(3)), bytes32(uint256(uint160(address(this)))));
+        vm.prank(address(this));
+        vm.expectRevert(LiFiDEXAggregator.UniswapV3SwapCallbackNotPositiveAmount.selector);
+        liFiDEXAggregator.ramsesV2SwapCallback(0, 0, abi.encode(address(0)));
+    }
+}
