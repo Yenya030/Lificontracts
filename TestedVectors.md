@@ -131,3 +131,7 @@
 - Test: `forge test --match-path test/solidity/Security/AcrossFacetV3Zero.t.sol`
 - Result: Contract deploys with `spokePool` and `wrappedNative` set to zero, leaving the facet unusable.
 
+## AcrossFacetPackedV3 constructor allows zero addresses
+- Severity: Medium
+- Test: `forge test --match-path test/solidity/Security/AcrossFacetPackedV3Zero.t.sol`
+- Result: Contract deploys with zero `spokePool` and `wrappedNative`, leading to misconfiguration and potential fund loss.
