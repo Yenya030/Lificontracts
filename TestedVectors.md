@@ -1,4 +1,5 @@
 
+
 # Tested Vectors
 
 ## Patcher Deposit Token Theft
@@ -224,6 +225,12 @@
 - Severity: Medium
 - Test: `forge test --match-path test/solidity/Security/GnosisBridgeFacetZero.t.sol`
 - Result: Deployment with `_gnosisBridgeRouter` set to `address(0)` reverts with `InvalidConfig`, preventing misconfiguration.
+## HopFacetPacked constructor allows zero wrapper and owner
+- Severity: Medium
+- Test: `forge test --match-path test/solidity/Security/HopFacetPackedZero.t.sol`
+- Result: Contract deploys with zero owner and Hop wrapper, leaving bridging addresses unset and potentially causing bridge calls to fail.
+
+
 ## DeBridgeDlnFacet constructor rejects zero DLN source address
 - Severity: Medium
 - Test: `forge test --match-path test/solidity/Security/DeBridgeDlnFacetZero.t.sol`
