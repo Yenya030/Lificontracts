@@ -116,7 +116,22 @@
 - Severity: Medium
 - Test: `forge test --match-path test/solidity/Security/ExecutorLeftover.t.sol`
 - Result: Excess input tokens are returned to the receiver, leaving no balance in `Executor`.
-## GenericSwapFacetV3 single-swap zero receiver burns tokens
+## GenericSwapFacetV3 constructor allows zero native address
 - Severity: Medium
-- Test: `forge test --match-path test/solidity/Security/GenericSwapFacetV3ZeroReceiver.t.sol`
-- Result: Passing zero receiver causes leftover tokens to be sent to address(0), permanently burning the funds.
+- Test: `forge test --match-path test/solidity/Security/GenericSwapFacetV3Zero.t.sol`
+- Result: Contract deploys with `NATIVE_ADDRESS` set to zero, leaving swaps misconfigured and potentially locking funds.
+
+## StargateFacetV2 constructor allows zero token messaging address
+- Severity: Medium
+- Test: `forge test --match-path test/solidity/Security/StargateFacetV2Zero.t.sol`
+- Result: Contract deploys with `tokenMessaging` set to zero, preventing pool lookups and halting bridging.
+
+## AcrossFacetV3 constructor allows zero addresses
+- Severity: Medium
+- Test: `forge test --match-path test/solidity/Security/AcrossFacetV3Zero.t.sol`
+- Result: Contract deploys with `spokePool` and `wrappedNative` set to zero, leaving the facet unusable.
+
+## AcrossFacetPackedV3 constructor allows zero addresses
+- Severity: Medium
+- Test: `forge test --match-path test/solidity/Security/AcrossFacetPackedV3Zero.t.sol`
+- Result: Contract deploys with zero `spokePool` and `wrappedNative`, leading to misconfiguration and potential fund loss.
