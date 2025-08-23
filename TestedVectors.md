@@ -165,3 +165,14 @@
 - Severity: Medium
 - Test: `forge test --match-path test/solidity/Security/CelerCircleBridgeFacetZero.t.sol`
 - Result: Contract deploys with zero `circleBridgeProxy` and `usdc` addresses; calls to `startBridgeTokensViaCelerCircleBridge` succeed but leave tokens stuck in the contract.
+
+## OmniBridgeFacet constructor allows zero addresses
+- Severity: Medium
+- Test: `forge test --match-path test/solidity/Security/OmniBridgeFacetZero.t.sol`
+- Result: Contract deploys with zero `foreignOmniBridge` and `wethOmniBridge`; calls to `startBridgeTokensViaOmniBridge` revert, leaving facet unusable.
+
+## ThorSwapFacet constructor allows zero router address
+- Severity: Medium
+- Test: `forge test --match-path test/solidity/Security/ThorSwapFacetZero.t.sol`
+- Result: Contract deploys with `thorchainRouter` set to zero; bridge calls revert, disabling ThorSwap operations.
+
