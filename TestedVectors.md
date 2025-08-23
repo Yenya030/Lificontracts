@@ -64,3 +64,8 @@
 - Severity: Medium
 - Test: `forge test --match-path test/solidity/Periphery/TokenWrapper.t.sol --match-test testWithdrawRevertsOnFalseTransferFrom`
 - Result: `withdraw` reverts when the wrapped token's `transferFrom` returns false, preventing ETH release without token transfer.
+
+## GasZipPeriphery deposit reentrancy drains funds
+- Severity: High
+- Test: `forge test --match-path test/solidity/Security/GasZipPeripheryReentrancy.t.sol`
+- Result: Malicious GasZip router can reenter `depositToGasZipNative` and siphon the contract's ETH balance.
