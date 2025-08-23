@@ -155,3 +155,8 @@
 - Severity: Medium
 - Test: `forge test --match-path test/solidity/Security/ReceiverChainflipAllowance.t.sol`
 - Result: After a successful `cfReceive` call, the token allowance granted to `Executor` drops to zero, leaving no residual approval for later misuse.
+
+## CBridgeFacet constructor allows zero cBridge address
+- Severity: Medium
+- Test: `forge test --match-path test/solidity/Security/CBridgeFacetZero.t.sol`
+- Result: Contract deploys with `cBridge` set to zero, causing bridge calls to send funds to the zero address and render the facet unusable.
