@@ -111,3 +111,8 @@
 - Severity: High
 - Test: `forge test --match-path test/solidity/Security/RelayFacetReentrancyStart.t.sol`
 - Result: Reentrancy attempt reverted; `ReentrancyGuard` prevents reuse of request IDs before `consumedIds` update.
+
+## Executor single-swap partial fill refunds leftovers
+- Severity: Medium
+- Test: `forge test --match-path test/solidity/Security/ExecutorLeftover.t.sol`
+- Result: Excess input tokens are returned to the receiver, leaving no balance in `Executor`.
