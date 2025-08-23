@@ -206,3 +206,8 @@
 - Severity: Medium (privileged)
 - Test: `forge test --match-path test/solidity/Security/LiFiTimelockController.t.sol --match-test test_SetDiamondAddressAllowsZero`
 - Result: Admin can set `diamond` to `address(0)`, potentially disabling timelock functions; requires `TIMELOCK_ADMIN_ROLE` so not exploitable by unprivileged users.
+## LiFiDiamond constructor allows zero owner
+- Severity: Medium
+- Test: `forge test --match-path test/solidity/Security/LiFiDiamondZeroOwner.t.sol`
+- Result: Deployment with `_contractOwner` set to `address(0)` succeeds, leaving the diamond without an owner and blocking further upgrades via `diamondCut`.
+
