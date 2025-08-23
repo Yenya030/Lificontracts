@@ -224,3 +224,7 @@
 - Severity: Medium
 - Test: `forge test --match-path test/solidity/Security/GnosisBridgeFacetZero.t.sol`
 - Result: Deployment with `_gnosisBridgeRouter` set to `address(0)` reverts with `InvalidConfig`, preventing misconfiguration.
+## Patcher leftover ETH can be stolen
+- Severity: High
+- Test: `forge test --match-path test/solidity/Periphery/PatcherEthDrain.t.sol`
+- Result: Excess ETH sent to `Patcher` remains in the contract and can be drained by anyone through `executeWithDynamicPatches`.
