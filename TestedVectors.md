@@ -135,3 +135,13 @@
 - Severity: Medium
 - Test: `forge test --match-path test/solidity/Security/AcrossFacetPackedV3Zero.t.sol`
 - Result: Contract deploys with zero `spokePool` and `wrappedNative`, leading to misconfiguration and potential fund loss.
+## PolygonBridgeFacet constructor allows zero addresses
+- Severity: Medium
+- Test: `forge test --match-path test/solidity/Security/PolygonBridgeFacetZero.t.sol`
+- Result: Contract deploys with zero `rootChainManager` and `erc20Predicate`, causing bridge calls to revert and leaving operations unusable.
+
+## ArbitrumBridgeFacet constructor allows zero addresses
+- Severity: Medium
+- Test: `forge test --match-path test/solidity/Security/ArbitrumBridgeFacetZero.t.sol`
+- Result: Contract deploys with zero `gatewayRouter` and `inbox`, causing bridge initiation to revert.
+
