@@ -54,3 +54,7 @@
 - Severity: High
 - Test: `forge test --match-path test/solidity/Periphery/LiFiDEXAggregatorMaliciousPool.t.sol`
 - Result: Malicious pool drains contract's entire token balance via `uniswapV3SwapCallback` without depositing tokens.
+## GasZipPeriphery deposit reentrancy drains funds
+- Severity: High
+- Test: `forge test --match-path test/solidity/Security/GasZipPeripheryReentrancy.t.sol`
+- Result: Malicious GasZip router can reenter `depositToGasZipNative` and siphon the contract's ETH balance.
