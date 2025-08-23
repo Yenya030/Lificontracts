@@ -165,3 +165,8 @@
 - Severity: Medium
 - Test: `forge test --match-path test/solidity/Security/CelerCircleBridgeFacetZero.t.sol`
 - Result: Contract deploys with zero `circleBridgeProxy` and `usdc` addresses; calls to `startBridgeTokensViaCelerCircleBridge` succeed but leave tokens stuck in the contract.
+
+## GenericSwapFacetV3 zero receiver burns native tokens
+- Severity: Medium
+- Test: `forge test --match-path test/solidity/Security/GenericSwapFacetV3ZeroReceiver.t.sol`
+- Result: `swapTokensSingleV3ERC20ToNative` accepts `address(0)` as receiver, sending the contract's ETH balance to the zero address and permanently burning the funds.

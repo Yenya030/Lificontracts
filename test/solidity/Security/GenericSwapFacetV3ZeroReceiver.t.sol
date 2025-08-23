@@ -1,90 +1,65 @@
 // SPDX-License-Identifier: UNLICENSED
 pragma solidity ^0.8.17;
 
-import "forge-std/Test.sol";
-import { GenericSwapFacetV3 } from "lifi/Facets/GenericSwapFacetV3.sol";
-import { LibSwap } from "lifi/Libraries/LibSwap.sol";
-import { LibAllowList } from "lifi/Libraries/LibAllowList.sol";
-
-contract TestGenericSwapFacetV3 is GenericSwapFacetV3 {
-    constructor() GenericSwapFacetV3(address(0)) {}
-    function addDex(address _dex) external { LibAllowList.addAllowedContract(_dex); }
-    function setFunctionApprovalBySignature(bytes4 _sig) external { LibAllowList.addAllowedSelector(_sig); }
-}
+import {Test} from "forge-std/Test.sol";
+import {GenericSwapFacetV3} from "lifi/Facets/GenericSwapFacetV3.sol";
+import {LibSwap} from "lifi/Libraries/LibSwap.sol";
+import {LibAllowList} from "lifi/Libraries/LibAllowList.sol";
+import {TestToken} from "../utils/TestToken.sol";
 
 contract DummyDex {
-    function swap(address, address, uint256) external {}
+    function noop() external {}
 }
 
-// ERC20 token that allows transfers to the zero address
-contract LooseToken {
-    string public constant name = "Loose";
-    string public constant symbol = "LOOSE";
-    uint8 public constant decimals = 18;
-    mapping(address => uint256) public balanceOf;
-    mapping(address => mapping(address => uint256)) public allowance;
+contract GenericSwapFacetV3Harness is GenericSwapFacetV3 {
+    constructor(address _nativeAddress) GenericSwapFacetV3(_nativeAddress) {}
 
-    constructor(uint256 supply) { balanceOf[msg.sender] = supply; }
-
-    function approve(address spender, uint256 amount) external returns (bool) {
-        allowance[msg.sender][spender] = amount;
-        return true;
+    function addAllowedContract(address _contract) external {
+        LibAllowList.addAllowedContract(_contract);
     }
 
-    function transfer(address to, uint256 amount) external returns (bool) {
-        balanceOf[msg.sender] -= amount;
-        balanceOf[to] += amount;
-        return true;
-    }
-
-    function transferFrom(address from, address to, uint256 amount) external returns (bool) {
-        uint256 allowed = allowance[from][msg.sender];
-        require(allowed >= amount, "allowance");
-        allowance[from][msg.sender] = allowed - amount;
-        balanceOf[from] -= amount;
-        balanceOf[to] += amount;
-        return true;
+    function addAllowedSelector(bytes4 _selector) external {
+        LibAllowList.addAllowedSelector(_selector);
     }
 }
 
 contract GenericSwapFacetV3ZeroReceiverTest is Test {
-    TestGenericSwapFacetV3 facet;
+    GenericSwapFacetV3Harness facet;
     DummyDex dex;
-    LooseToken token;
+    TestToken token;
 
     function setUp() public {
-        facet = new TestGenericSwapFacetV3();
+        facet = new GenericSwapFacetV3Harness(address(0));
         dex = new DummyDex();
-        token = new LooseToken(1 ether);
+        token = new TestToken("Token", "TKN", 18);
 
-        facet.addDex(address(dex));
-        facet.setFunctionApprovalBySignature(DummyDex.swap.selector);
+        facet.addAllowedContract(address(dex));
+        facet.addAllowedSelector(DummyDex.noop.selector);
 
-        token.approve(address(facet), type(uint256).max);
+        // Pre-fund facet with native tokens
+        vm.deal(address(facet), 1 ether);
     }
 
-    function test_ZeroReceiverBurnsTokens() public {
-        LibSwap.SwapData memory swapData = LibSwap.SwapData({
+    function test_SendToZeroBurnsETH() public {
+        LibSwap.SwapData memory swap = LibSwap.SwapData({
             callTo: address(dex),
             approveTo: address(dex),
             sendingAssetId: address(token),
-            receivingAssetId: address(token),
-            fromAmount: 1 ether,
-            callData: abi.encodeWithSelector(DummyDex.swap.selector, address(token), address(token), 1 ether),
-            requiresDeposit: true
+            receivingAssetId: address(0),
+            fromAmount: 0,
+            callData: abi.encodeWithSelector(DummyDex.noop.selector),
+            requiresDeposit: false
         });
 
-        facet.swapTokensSingleV3ERC20ToERC20(
-            bytes32("tx"),
+        facet.swapTokensSingleV3ERC20ToNative(
+            bytes32(0),
             "",
             "",
             payable(address(0)),
             0,
-            swapData
+            swap
         );
 
-        assertEq(token.balanceOf(address(0)), 1 ether);
-        assertEq(token.balanceOf(address(facet)), 0);
+        assertEq(address(facet).balance, 0);
     }
 }
-
