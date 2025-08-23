@@ -40,6 +40,8 @@
 | 2025-08-22 | Unauthorized Algebra swap callback invocation | High | Reverted with `UniswapV3SwapCallbackUnknownSource` |
 | 2025-08-22 | Zero or negative amount in Algebra swap callback | Medium | Reverted with `UniswapV3SwapCallbackNotPositiveAmount` |
 | 2025-08-22 | Reentrancy during token transfer triggers Algebra swap callback | High | Reverted with `UniswapV3SwapCallbackUnknownSource` |
+| 2025-08-23 | Unauthorized RamsesV2 swap callback invocation | High | Reverted with `UniswapV3SwapCallbackUnknownSource` |
+| 2025-08-23 | Zero or negative amount in RamsesV2 swap callback | Medium | Reverted with `UniswapV3SwapCallbackNotPositiveAmount` |
 | Vector | Severity | Status | Notes |
 | ------ | -------- | ------ | ----- |
 | Using zero address as receiver in swapTokensGeneric | Medium | Mitigated | Reverts with InvalidReceiver; covered by test |
@@ -90,7 +92,12 @@
 - Severity: Medium
 - Test: `forge test --match-test testZeroAddressIntegratorLocksFees`
 - Result: Fees collected for `integratorAddress` set to `address(0)` cannot be withdrawn and remain locked in the contract.
-## FeeCollector refund reentrancy during collectNativeFees
+## ReceiverStargateV2 constructor allows zero addresses
 - Severity: Medium
-- Test: `forge test --match-path test/solidity/Security/FeeCollectorReentrancy.t.sol`
-- Result: Reentrant call during refund only withdraws the caller's integrator fees; LiFi fees remain and contract balance is unchanged.
+- Test: `forge test --match-path test/solidity/Security/ReceiverStargateV2Zero.t.sol`
+- Result: Contract deploys with zero executor, tokenMessaging, and endpoint addresses, leaving the receiver misconfigured and unusable.
+
+## Permit2Proxy constructor allows zero addresses
+- Severity: Medium
+- Test: `forge test --match-path test/solidity/Security/Permit2ProxyZero.t.sol`
+- Result: Contract deploys with zero LIFI diamond, Permit2, and owner addresses, risking misconfiguration and locked funds.
