@@ -1,7 +1,3 @@
-
-
-
-
 # Tested Vectors
 
 ## Patcher Deposit Token Theft
@@ -217,3 +213,8 @@
 - Severity: Medium
 - Test: `forge test --match-path test/solidity/Security/LiFiDiamondZeroOwner.t.sol`
 - Result: Deployment with `_contractOwner` set to `address(0)` succeeds, leaving the diamond without an owner and blocking further upgrades via `diamondCut`.
+
+## OmniBridgeFacet constructor allows zero addresses
+- Severity: Medium
+- Test: `forge test --match-path test/solidity/Security/OmniBridgeFacetZero.t.sol`
+- Result: Contract deploys with zero `foreignOmniBridge` and `wethOmniBridge`, rendering bridging calls unusable as they revert.
