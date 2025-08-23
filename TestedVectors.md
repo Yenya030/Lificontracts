@@ -224,3 +224,12 @@
 - Severity: Medium
 - Test: `forge test --match-path test/solidity/Security/GnosisBridgeFacetZero.t.sol`
 - Result: Deployment with `_gnosisBridgeRouter` set to `address(0)` reverts with `InvalidConfig`, preventing misconfiguration.
+## DeBridgeDlnFacet constructor rejects zero DLN source address
+- Severity: Medium
+- Test: `forge test --match-path test/solidity/Security/DeBridgeDlnFacetZero.t.sol`
+- Result: Deployment with `_dlnSource` set to `address(0)` reverts with `InvalidConfig`, preventing misconfiguration.
+
+## PioneerFacet zero-address validations
+- Severity: Medium
+- Test: `forge test --match-path test/solidity/Security/PioneerFacetZero.t.sol`
+- Result: Constructor reverts on zero `_pioneerAddress` and bridging reverts when `refundAddress` is zero, preventing unauthorized refunds or misconfiguration.
