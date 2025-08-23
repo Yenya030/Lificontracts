@@ -135,3 +135,18 @@
 - Severity: Medium
 - Test: `forge test --match-path test/solidity/Security/AcrossFacetPackedV3Zero.t.sol`
 - Result: Contract deploys with zero `spokePool` and `wrappedNative`, leading to misconfiguration and potential fund loss.
+## ArbitrumBridgeFacet constructor allows zero addresses
+- Severity: Medium
+- Test: `forge test --match-path test/solidity/Security/ArbitrumBridgeFacetZero.t.sol`
+- Result: Contract deploys with `gatewayRouter` and `inbox` set to zero, leaving the facet misconfigured and unusable.
+
+## CelerCircleBridgeFacet constructor allows zero addresses
+- Severity: Medium
+- Test: `forge test --match-path test/solidity/Security/CelerCircleBridgeFacetZero.t.sol`
+- Result: Contract deploys with zero `circleBridgeProxy` and `usdc` addresses, causing bridge operations to revert.
+
+## ReceiverChainflip constructor rejects zero addresses
+- Severity: Medium
+- Test: `forge test --match-path test/solidity/Security/ReceiverChainflipZero.t.sol`
+- Result: Constructor reverts with `InvalidConfig` when provided zero owner, executor, or vault, preventing misconfiguration.
+
