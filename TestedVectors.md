@@ -135,3 +135,13 @@
 - Severity: Medium
 - Test: `forge test --match-path test/solidity/Security/AcrossFacetPackedV3Zero.t.sol`
 - Result: Contract deploys with zero `spokePool` and `wrappedNative`, leading to misconfiguration and potential fund loss.
+## OmniBridgeFacet constructor allows zero addresses
+- Severity: Medium
+- Test: `forge test --match-path test/solidity/Security/OmniBridgeFacetZero.t.sol`
+- Result: Contract deploys with zero `foreignOmniBridge` and `wethOmniBridge` addresses; `startBridgeTokensViaOmniBridge` reverts, leaving the facet unusable.
+
+## PolygonBridgeFacet constructor allows zero addresses
+- Severity: Medium
+- Test: `forge test --match-path test/solidity/Security/PolygonBridgeFacetZero.t.sol`
+- Result: Contract deploys with zero `rootChainManager` and `erc20Predicate`, causing `startBridgeTokensViaPolygonBridge` to revert and risking misconfiguration and fund lockup.
+
