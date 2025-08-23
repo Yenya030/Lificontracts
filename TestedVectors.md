@@ -1,3 +1,4 @@
+
 # Tested Vectors
 
 ## Patcher Deposit Token Theft
@@ -218,3 +219,8 @@
 - Severity: Medium
 - Test: `forge test --match-path test/solidity/Security/OmniBridgeFacetZero.t.sol`
 - Result: Contract deploys with zero `foreignOmniBridge` and `wethOmniBridge`, rendering bridging calls unusable as they revert.
+
+## GnosisBridgeFacet constructor rejects zero router address
+- Severity: Medium
+- Test: `forge test --match-path test/solidity/Security/GnosisBridgeFacetZero.t.sol`
+- Result: Deployment with `_gnosisBridgeRouter` set to `address(0)` reverts with `InvalidConfig`, preventing misconfiguration.
