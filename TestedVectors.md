@@ -206,3 +206,7 @@
 - Severity: Medium (privileged)
 - Test: `forge test --match-path test/solidity/Security/LiFiTimelockController.t.sol --match-test test_SetDiamondAddressAllowsZero`
 - Result: Admin can set `diamond` to `address(0)`, potentially disabling timelock functions; requires `TIMELOCK_ADMIN_ROLE` so not exploitable by unprivileged users.
+## OmniBridgeFacet constructor allows zero addresses
+- Severity: Medium
+- Test: `forge test --match-path test/solidity/Security/OmniBridgeFacetZero.t.sol`
+- Result: Contract deploys with zero `foreignOmniBridge` and `wethOmniBridge` addresses; bridge calls revert and tokens may be locked.
