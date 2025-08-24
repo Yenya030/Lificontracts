@@ -270,3 +270,7 @@
 - Severity: Medium
 - Test: `forge test --match-path test/solidity/Security/GlacisFacetZeroRefundAddress.t.sol`
 - Result: `_startBridge` reverts with `InvalidRefundAddress` when `refundAddress` is zero, preventing misconfiguration.
+## HopFacet unlimited token allowance to bridge
+- Severity: High
+- Test: `forge test --match-path test/solidity/Security/HopFacetAllowance.t.sol`
+- Result: HopFacet leaves an unlimited allowance to the Hop bridge contract after bridging, enabling token drain if the bridge is compromised.
