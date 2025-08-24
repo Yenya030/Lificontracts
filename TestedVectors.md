@@ -345,3 +345,14 @@
 - Severity: High
 - Test: `forge test --match-path test/solidity/Security/ChainflipFacetAllowance.t.sol`
 - Result: `startBridgeTokensViaChainflip` leaves an unlimited allowance to the Chainflip vault, allowing a compromised vault to drain any tokens later sent to the facet.
+
+## ThorSwapFacet unlimited token allowance to router
+- Severity: High
+- Test: `forge test --match-path test/solidity/Security/ThorSwapFacetAllowance.t.sol`
+- Result: `startBridgeTokensViaThorSwap` leaves an unlimited allowance to the Thorchain router, enabling token drain via `transferFrom` if the router is compromised.
+
+
+## MayanFacet unlimited token allowance to router
+- Severity: High
+- Test: `forge test --match-path test/solidity/Security/MayanFacetAllowance.t.sol`
+- Result: `startBridgeTokensViaMayan` leaves an unlimited allowance to the Mayan router, enabling token drain via `transferFrom` if the router is compromised.
