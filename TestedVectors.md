@@ -284,3 +284,8 @@
 - Severity: High
 - Test: `forge test --match-path test/solidity/Security/LibSwapUnlimitedAllowance.t.sol`
 - Result: `LibSwap.swap` leaves unlimited approval to user-specified `approveTo`, allowing approved contract to drain any tokens later sent to the executor.
+
+## ReceiverChainflip zero receiver burns funds
+- Severity: Medium
+- Test: `forge test --match-path test/solidity/Security/ReceiverChainflipZeroReceiver.t.sol`
+- Result: `cfReceive` accepts `receiver = address(0)` and transfers tokens to the zero address, permanently burning the funds.
