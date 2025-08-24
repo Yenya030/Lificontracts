@@ -299,3 +299,8 @@
 - Severity: Medium
 - Test: `forge test --match-path test/solidity/Security/MayanFacetDust.t.sol`
 - Result: Excess native tokens are refunded to the caller via `refundExcessNative`, leaving no dust in the contract.
+
+## HopFacet unlimited token allowance to bridge
+- Severity: High
+- Test: `forge test --match-path test/solidity/Security/HopFacetAllowance.t.sol`
+- Result: HopFacet leaves an unlimited allowance to the Hop bridge contract after bridging, enabling token drain if the bridge is compromised.
