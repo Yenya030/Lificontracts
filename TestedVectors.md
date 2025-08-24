@@ -304,3 +304,7 @@
 - Severity: High
 - Test: `forge test --match-path test/solidity/Security/HopFacetAllowance.t.sol`
 - Result: HopFacet leaves an unlimited allowance to the Hop bridge contract after bridging, enabling token drain if the bridge is compromised.
+## GenericSwapFacetV3 reentrancy drains token balance
+- Severity: High
+- Test: `forge test --match-path test/solidity/Security/GenericSwapFacetV3Reentrancy.t.sol`
+- Result: Malicious DEX reenters swap to transfer entire contract token balance to attacker before outer call completes.
