@@ -320,3 +320,8 @@
 - Severity: High
 - Test: `forge test --match-path test/solidity/Security/GenericSwapFacetV3Reentrancy.t.sol`
 - Result: Malicious DEX reenters swap to transfer entire contract token balance to attacker before outer call completes.
+
+## DexManagerFacet rejects zero DEX address
+- Severity: Medium
+- Test: `forge test --match-path test/solidity/Security/DexManagerFacetZero.t.sol`
+- Result: `addDex` reverts with `InvalidContract` when given the zero address, preventing misconfiguration of the DEX allow list.
