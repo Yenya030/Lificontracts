@@ -294,3 +294,8 @@
 - Severity: Medium
 - Test: `forge test --match-path test/solidity/Security/SwapperV2FetchBalancesReverts.t.sol`
 - Result: `_fetchBalances` subtracts `msg.value` for each native receiving asset before deposits, causing underflow and reverting.`
+
+## MayanFacet native amount normalization refund
+- Severity: Medium
+- Test: `forge test --match-path test/solidity/Security/MayanFacetDust.t.sol`
+- Result: Excess native tokens are refunded to the caller via `refundExcessNative`, leaving no dust in the contract.
