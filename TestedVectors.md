@@ -289,3 +289,8 @@
 - Severity: Medium
 - Test: `forge test --match-path test/solidity/Security/ReceiverChainflipZeroReceiver.t.sol`
 - Result: `cfReceive` accepts `receiver = address(0)` and transfers tokens to the zero address, permanently burning the funds.
+
+## SwapperV2 native balance underflow
+- Severity: Medium
+- Test: `forge test --match-path test/solidity/Security/SwapperV2FetchBalancesReverts.t.sol`
+- Result: `_fetchBalances` subtracts `msg.value` for each native receiving asset before deposits, causing underflow and reverting.`
