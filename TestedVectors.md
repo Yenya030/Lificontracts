@@ -270,3 +270,7 @@
 - Severity: Medium
 - Test: `forge test --match-path test/solidity/Security/GlacisFacetZeroRefundAddress.t.sol`
 - Result: `_startBridge` reverts with `InvalidRefundAddress` when `refundAddress` is zero, preventing misconfiguration.
+## MayanFacet native amount normalization refund
+- Severity: Medium
+- Test: `forge test --match-path test/solidity/Security/MayanFacetDust.t.sol`
+- Result: Excess native tokens are refunded to the caller via `refundExcessNative`, leaving no dust in the contract.
