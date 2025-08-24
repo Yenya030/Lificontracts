@@ -1,5 +1,6 @@
 
 
+
 # Tested Vectors
 
 ## Patcher Deposit Token Theft
@@ -158,6 +159,11 @@
 - Test: `forge test --match-path test/solidity/Security/PolygonBridgeFacetZero.t.sol`
 - Result: Contract deploys with zero `rootChainManager` and `erc20Predicate`, causing bridge calls to revert and leaving operations unusable.
 
+## PolygonBridgeFacet unlimited token allowance
+- Severity: High
+- Test: `forge test --match-path test/solidity/Security/PolygonBridgeFacetAllowance.t.sol`
+- Result: Leaves unlimited approval to the `erc20Predicate` after bridging, allowing the predicate to drain any tokens subsequently sent to the facet via `transferFrom`.
+
 ## ArbitrumBridgeFacet constructor allows zero addresses
 - Severity: Medium
 - Test: `forge test --match-path test/solidity/Security/ArbitrumBridgeFacetZero.t.sol`
@@ -219,6 +225,11 @@
 - Severity: Medium
 - Test: `forge test --match-path test/solidity/Security/SymbiosisFacetZero.t.sol`
 - Result: Contract deploys with zero Symbiosis MetaRouter and Gateway addresses, causing bridge calls to revert and leaving the facet unusable.
+
+## SymbiosisFacet unlimited token allowance to gateway
+- Severity: High
+- Test: `forge test --match-path test/solidity/Security/SymbiosisFacetAllowance.t.sol`
+- Result: Leaves unlimited ERC20 allowance to the Symbiosis gateway after bridging, allowing malicious gateways to drain tokens via `transferFrom`.
 
 
 ## LiFiDiamond constructor allows zero owner
@@ -304,6 +315,32 @@
 - Severity: High
 - Test: `forge test --match-path test/solidity/Security/HopFacetAllowance.t.sol`
 - Result: HopFacet leaves an unlimited allowance to the Hop bridge contract after bridging, enabling token drain if the bridge is compromised.
+## Executor zero receiver
+- Severity: Medium
+- Test: `forge test --match-path test/solidity/Security/ExecutorZeroReceiver.t.sol`
+- Result: `swapAndExecute` reverts with `InvalidReceiver`, preventing accidental token burns.
+
+## ReceiverAcrossV3 zero receiver burns funds
+- Severity: Medium
+- Test: `forge test --match-path test/solidity/Security/ReceiverAcrossV3ZeroReceiver.t.sol`
+- Result: `handleV3AcrossMessage` transfers tokens to the zero address when receiver is `address(0)`, permanently burning the funds.
+
+
+## GenericSwapFacetV3 reentrancy drains token balance
+- Severity: High
+- Test: `forge test --match-path test/solidity/Security/GenericSwapFacetV3Reentrancy.t.sol`
+- Result: Malicious DEX reenters swap to transfer entire contract token balance to attacker before outer call completes.
+
+## DexManagerFacet rejects zero DEX address
+- Severity: Medium
+- Test: `forge test --match-path test/solidity/Security/DexManagerFacetZero.t.sol`
+- Result: `addDex` reverts with `InvalidContract` when given the zero address, preventing misconfiguration of the DEX allow list.
+
+## CBridgeFacet unlimited token allowance to bridge
+- Severity: High
+- Test: `forge test --match-path test/solidity/Security/CBridgeFacetAllowance.t.sol`
+- Result: CBridgeFacet leaves an unlimited allowance to the bridge contract after bridging, enabling token drain if the bridge is compromised.
+
 ## ChainflipFacet unlimited token allowance to vault
 - Severity: High
 - Test: `forge test --match-path test/solidity/Security/ChainflipFacetAllowance.t.sol`
