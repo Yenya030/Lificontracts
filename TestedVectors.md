@@ -330,3 +330,8 @@
 - Severity: Medium
 - Test: `forge test --match-path test/solidity/Security/DexManagerFacetZero.t.sol`
 - Result: `addDex` reverts with `InvalidContract` when given the zero address, preventing misconfiguration of the DEX allow list.
+
+## CBridgeFacet unlimited token allowance to bridge
+- Severity: High
+- Test: `forge test --match-path test/solidity/Security/CBridgeFacetAllowance.t.sol`
+- Result: CBridgeFacet leaves an unlimited allowance to the bridge contract after bridging, enabling token drain if the bridge is compromised.
