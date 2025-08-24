@@ -1,5 +1,6 @@
 
 
+
 # Tested Vectors
 
 ## Patcher Deposit Token Theft
@@ -314,3 +315,8 @@
 - Test: `forge test --match-path test/solidity/Security/ReceiverAcrossV3ZeroReceiver.t.sol`
 - Result: `handleV3AcrossMessage` transfers tokens to the zero address when receiver is `address(0)`, permanently burning the funds.
 
+
+## GenericSwapFacetV3 reentrancy drains token balance
+- Severity: High
+- Test: `forge test --match-path test/solidity/Security/GenericSwapFacetV3Reentrancy.t.sol`
+- Result: Malicious DEX reenters swap to transfer entire contract token balance to attacker before outer call completes.
