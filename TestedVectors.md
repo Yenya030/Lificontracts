@@ -1,5 +1,6 @@
 
 
+
 # Tested Vectors
 
 ## Patcher Deposit Token Theft
@@ -304,6 +305,22 @@
 - Severity: High
 - Test: `forge test --match-path test/solidity/Security/HopFacetAllowance.t.sol`
 - Result: HopFacet leaves an unlimited allowance to the Hop bridge contract after bridging, enabling token drain if the bridge is compromised.
+## Executor zero receiver
+- Severity: Medium
+- Test: `forge test --match-path test/solidity/Security/ExecutorZeroReceiver.t.sol`
+- Result: `swapAndExecute` reverts with `InvalidReceiver`, preventing accidental token burns.
+
+## ReceiverAcrossV3 zero receiver burns funds
+- Severity: Medium
+- Test: `forge test --match-path test/solidity/Security/ReceiverAcrossV3ZeroReceiver.t.sol`
+- Result: `handleV3AcrossMessage` transfers tokens to the zero address when receiver is `address(0)`, permanently burning the funds.
+
+
+## GenericSwapFacetV3 reentrancy drains token balance
+- Severity: High
+- Test: `forge test --match-path test/solidity/Security/GenericSwapFacetV3Reentrancy.t.sol`
+- Result: Malicious DEX reenters swap to transfer entire contract token balance to attacker before outer call completes.
+
 ## DexManagerFacet rejects zero DEX address
 - Severity: Medium
 - Test: `forge test --match-path test/solidity/Security/DexManagerFacetZero.t.sol`
