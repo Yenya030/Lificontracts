@@ -159,6 +159,11 @@
 - Test: `forge test --match-path test/solidity/Security/PolygonBridgeFacetZero.t.sol`
 - Result: Contract deploys with zero `rootChainManager` and `erc20Predicate`, causing bridge calls to revert and leaving operations unusable.
 
+## PolygonBridgeFacet unlimited token allowance
+- Severity: High
+- Test: `forge test --match-path test/solidity/Security/PolygonBridgeFacetAllowance.t.sol`
+- Result: Leaves unlimited approval to the `erc20Predicate` after bridging, allowing the predicate to drain any tokens subsequently sent to the facet via `transferFrom`.
+
 ## ArbitrumBridgeFacet constructor allows zero addresses
 - Severity: Medium
 - Test: `forge test --match-path test/solidity/Security/ArbitrumBridgeFacetZero.t.sol`
