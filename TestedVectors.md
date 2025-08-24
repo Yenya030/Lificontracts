@@ -270,3 +270,8 @@
 - Severity: Medium
 - Test: `forge test --match-path test/solidity/Security/GlacisFacetZeroRefundAddress.t.sol`
 - Result: `_startBridge` reverts with `InvalidRefundAddress` when `refundAddress` is zero, preventing misconfiguration.
+## ReceiverChainflip zero receiver burns funds
+- Severity: Medium
+- Test: `forge test --match-path test/solidity/Security/ReceiverChainflipZeroReceiver.t.sol`
+- Result: `cfReceive` accepts `receiver = address(0)` and transfers tokens to the zero address, permanently burning the funds.
+
