@@ -220,6 +220,11 @@
 - Test: `forge test --match-path test/solidity/Security/SymbiosisFacetZero.t.sol`
 - Result: Contract deploys with zero Symbiosis MetaRouter and Gateway addresses, causing bridge calls to revert and leaving the facet unusable.
 
+## SymbiosisFacet unlimited token allowance to gateway
+- Severity: High
+- Test: `forge test --match-path test/solidity/Security/SymbiosisFacetAllowance.t.sol`
+- Result: Leaves unlimited ERC20 allowance to the Symbiosis gateway after bridging, allowing malicious gateways to drain tokens via `transferFrom`.
+
 
 ## LiFiDiamond constructor allows zero owner
 - Severity: Medium
