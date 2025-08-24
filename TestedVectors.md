@@ -128,10 +128,20 @@
 - Test: `forge test --match-path test/solidity/Security/StargateFacetV2Zero.t.sol`
 - Result: Contract deploys with `tokenMessaging` set to zero, preventing pool lookups and halting bridging.
 
+## AcrossFacet constructor allows zero addresses
+- Severity: Medium
+- Test: `forge test --match-path test/solidity/Security/AcrossFacetZero.t.sol`
+- Result: Contract deploys with `spokePool` and `wrappedNative` set to zero, causing bridge attempts to revert and rendering the facet unusable.
+
 ## AcrossFacetV3 constructor allows zero addresses
 - Severity: Medium
 - Test: `forge test --match-path test/solidity/Security/AcrossFacetV3Zero.t.sol`
 - Result: Contract deploys with `spokePool` and `wrappedNative` set to zero, leaving the facet unusable.
+
+## AcrossFacetPacked constructor allows zero addresses
+- Severity: Medium
+- Test: `forge test --match-path test/solidity/Security/AcrossFacetPackedZero.t.sol`
+- Result: Contract deploys with zero `spokePool` and `wrappedNative`, causing bridge attempts to revert and rendering the facet unusable.
 
 ## AcrossFacetPackedV3 constructor allows zero addresses
 - Severity: Medium
