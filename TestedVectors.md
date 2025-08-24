@@ -304,3 +304,7 @@
 - Severity: High
 - Test: `forge test --match-path test/solidity/Security/HopFacetAllowance.t.sol`
 - Result: HopFacet leaves an unlimited allowance to the Hop bridge contract after bridging, enabling token drain if the bridge is compromised.
+## CBridgeFacet unlimited token allowance to bridge
+- Severity: High
+- Test: `forge test --match-path test/solidity/Security/CBridgeFacetAllowance.t.sol`
+- Result: CBridgeFacet leaves an unlimited allowance to the bridge contract after bridging, enabling token drain if the bridge is compromised.
