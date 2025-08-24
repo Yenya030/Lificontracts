@@ -270,3 +270,7 @@
 - Severity: Medium
 - Test: `forge test --match-path test/solidity/Security/GlacisFacetZeroRefundAddress.t.sol`
 - Result: `_startBridge` reverts with `InvalidRefundAddress` when `refundAddress` is zero, preventing misconfiguration.
+## LibSwap unlimited token allowance to arbitrary spender
+- Severity: High
+- Test: `forge test --match-path test/solidity/Security/LibSwapUnlimitedAllowance.t.sol`
+- Result: `LibSwap.swap` leaves unlimited approval to user-specified `approveTo`, allowing approved contract to drain any tokens later sent to the executor.
