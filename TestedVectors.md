@@ -270,3 +270,7 @@
 - Severity: Medium
 - Test: `forge test --match-path test/solidity/Security/GlacisFacetZeroRefundAddress.t.sol`
 - Result: `_startBridge` reverts with `InvalidRefundAddress` when `refundAddress` is zero, preventing misconfiguration.
+## SwapperV2 native balance underflow
+- Severity: Medium
+- Test: `forge test --match-path test/solidity/Security/SwapperV2FetchBalancesReverts.t.sol`
+- Result: `_fetchBalances` subtracts `msg.value` for each native receiving asset before deposits, causing underflow and reverting.`
