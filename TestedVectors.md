@@ -304,3 +304,14 @@
 - Severity: High
 - Test: `forge test --match-path test/solidity/Security/HopFacetAllowance.t.sol`
 - Result: HopFacet leaves an unlimited allowance to the Hop bridge contract after bridging, enabling token drain if the bridge is compromised.
+## ThorSwapFacet unlimited token allowance to router
+- Severity: High
+- Test: `forge test --match-path test/solidity/Security/ThorSwapFacetAllowance.t.sol`
+- Result: `startBridgeTokensViaThorSwap` leaves an unlimited allowance to the Thorchain router, enabling token drain via `transferFrom` if the router is compromised.
+
+
+## MayanFacet unlimited token allowance to router
+- Severity: High
+- Test: `forge test --match-path test/solidity/Security/MayanFacetAllowance.t.sol`
+- Result: `startBridgeTokensViaMayan` leaves an unlimited allowance to the Mayan router, enabling token drain via `transferFrom` if the router is compromised.
+
