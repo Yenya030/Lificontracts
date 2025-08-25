@@ -356,3 +356,13 @@
 - Severity: High
 - Test: `forge test --match-path test/solidity/Security/MayanFacetAllowance.t.sol`
 - Result: `startBridgeTokensViaMayan` leaves an unlimited allowance to the Mayan router, enabling token drain via `transferFrom` if the router is compromised.
+
+## HopFacetOptimized unlimited token allowance to bridge
+- Severity: High
+- Test: `forge test --match-path test/solidity/Security/HopFacetOptimizedAllowance.t.sol`
+- Result: HopFacetOptimized leaves an unlimited allowance to the Hop bridge, allowing a compromised bridge to drain tokens via `transferFrom`.
+
+## LidoWrapper wrap ignores failed transfer
+- Severity: Medium
+- Test: `forge test --match-path test/solidity/Security/LidoWrapperReturnFalse.t.sol`
+- Result: `wrapStETHToWstETH` ignores the return value of `transferFrom`, so wrapping succeeds even when token transfer fails, potentially misleading users.
