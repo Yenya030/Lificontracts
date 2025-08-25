@@ -370,3 +370,8 @@
 - Severity: High
 - Test: `forge test --match-path test/solidity/Security/Permit2ProxyAllowance.t.sol`
 - Result: After execution, `Permit2Proxy` grants unlimited ERC20 allowance to the diamond, allowing a compromised diamond to drain any tokens subsequently held by the proxy.
+
+## AllBridgeFacet unlimited token allowance to router
+- Severity: High
+- Test: `forge test --match-path test/solidity/Security/AllBridgeFacetAllowance.t.sol`
+- Result: `startBridgeTokensViaAllBridge` leaves an unlimited allowance to the AllBridge router, enabling token drain via `transferFrom` if the router is compromised.
