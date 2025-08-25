@@ -380,3 +380,8 @@
 - Severity: High
 - Test: `forge test --match-path test/solidity/Security/SquidFacetAllowance.t.sol`
 - Result: `startBridgeTokensViaSquid` leaves an unlimited allowance to the Squid router, enabling token drain via `transferFrom` if the router is compromised.
+
+## StargateFacetV2 unlimited token allowance to router
+- Severity: High
+- Test: `forge test --match-path test/solidity/Security/StargateFacetV2Allowance.t.sol`
+- Result: `startBridgeTokensViaStargate` leaves an unlimited allowance to the router returned by `tokenMessaging`, allowing a compromised router to drain any tokens subsequently sent to the facet.
