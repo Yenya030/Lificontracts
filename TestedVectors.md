@@ -331,6 +331,11 @@
 - Test: `forge test --match-path test/solidity/Security/GenericSwapFacetV3Reentrancy.t.sol`
 - Result: Malicious DEX reenters swap to transfer entire contract token balance to attacker before outer call completes.
 
+## GenericSwapFacetV3 unlimited token allowance to DEX
+- Severity: High
+- Test: `forge test --match-path test/solidity/Security/GenericSwapFacetV3Allowance.t.sol`
+- Result: `swapTokensSingleV3ERC20ToERC20` leaves an unlimited allowance to the approved DEX, allowing it to drain any tokens later sent to the facet.
+
 ## DexManagerFacet rejects zero DEX address
 - Severity: Medium
 - Test: `forge test --match-path test/solidity/Security/DexManagerFacetZero.t.sol`
@@ -356,13 +361,12 @@
 - Severity: High
 - Test: `forge test --match-path test/solidity/Security/MayanFacetAllowance.t.sol`
 - Result: `startBridgeTokensViaMayan` leaves an unlimited allowance to the Mayan router, enabling token drain via `transferFrom` if the router is compromised.
-
-## HopFacetOptimized unlimited token allowance to bridge
-- Severity: High
-- Test: `forge test --match-path test/solidity/Security/HopFacetOptimizedAllowance.t.sol`
-- Result: HopFacetOptimized leaves an unlimited allowance to the Hop bridge, allowing a compromised bridge to drain tokens via `transferFrom`.
-
-## LidoWrapper wrap ignores failed transfer
+## PeripheryRegistryFacet registers zero address
 - Severity: Medium
-- Test: `forge test --match-path test/solidity/Security/LidoWrapperReturnFalse.t.sol`
-- Result: `wrapStETHToWstETH` ignores the return value of `transferFrom`, so wrapping succeeds even when token transfer fails, potentially misleading users.
+- Test: `forge test --match-path test/solidity/Security/PeripheryRegistryFacetZero.t.sol`
+- Result: `registerPeripheryContract` accepts `address(0)` and stores it, enabling misconfiguration of registry entries.
+
+## Permit2Proxy unlimited token allowance to diamond
+- Severity: High
+- Test: `forge test --match-path test/solidity/Security/Permit2ProxyAllowance.t.sol`
+- Result: After execution, `Permit2Proxy` grants unlimited ERC20 allowance to the diamond, allowing a compromised diamond to drain any tokens subsequently held by the proxy.
