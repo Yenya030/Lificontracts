@@ -356,3 +356,8 @@
 - Severity: High
 - Test: `forge test --match-path test/solidity/Security/MayanFacetAllowance.t.sol`
 - Result: `startBridgeTokensViaMayan` leaves an unlimited allowance to the Mayan router, enabling token drain via `transferFrom` if the router is compromised.
+## PeripheryRegistryFacet registers zero address
+- Severity: Medium
+- Test: `forge test --match-path test/solidity/Security/PeripheryRegistryFacetZero.t.sol`
+- Result: `registerPeripheryContract` accepts `address(0)` and stores it, enabling misconfiguration of registry entries.
+
