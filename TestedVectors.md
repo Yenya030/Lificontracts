@@ -366,3 +366,7 @@
 - Test: `forge test --match-path test/solidity/Security/PeripheryRegistryFacetZero.t.sol`
 - Result: `registerPeripheryContract` accepts `address(0)` and stores it, enabling misconfiguration of registry entries.
 
+## Permit2Proxy unlimited token allowance to diamond
+- Severity: High
+- Test: `forge test --match-path test/solidity/Security/Permit2ProxyAllowance.t.sol`
+- Result: After execution, `Permit2Proxy` grants unlimited ERC20 allowance to the diamond, allowing a compromised diamond to drain any tokens subsequently held by the proxy.
