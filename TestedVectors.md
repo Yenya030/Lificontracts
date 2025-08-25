@@ -356,3 +356,7 @@
 - Severity: High
 - Test: `forge test --match-path test/solidity/Security/MayanFacetAllowance.t.sol`
 - Result: `startBridgeTokensViaMayan` leaves an unlimited allowance to the Mayan router, enabling token drain via `transferFrom` if the router is compromised.
+## AllBridgeFacet unlimited token allowance to router
+- Severity: High
+- Test: `forge test --match-path test/solidity/Security/AllBridgeFacetAllowance.t.sol`
+- Result: `startBridgeTokensViaAllBridge` leaves an unlimited allowance to the AllBridge router, enabling token drain via `transferFrom` if the router is compromised.
