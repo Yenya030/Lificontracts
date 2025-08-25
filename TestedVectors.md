@@ -331,6 +331,11 @@
 - Test: `forge test --match-path test/solidity/Security/GenericSwapFacetV3Reentrancy.t.sol`
 - Result: Malicious DEX reenters swap to transfer entire contract token balance to attacker before outer call completes.
 
+## GenericSwapFacetV3 unlimited token allowance to DEX
+- Severity: High
+- Test: `forge test --match-path test/solidity/Security/GenericSwapFacetV3Allowance.t.sol`
+- Result: `swapTokensSingleV3ERC20ToERC20` leaves an unlimited allowance to the approved DEX, allowing it to drain any tokens later sent to the facet.
+
 ## DexManagerFacet rejects zero DEX address
 - Severity: Medium
 - Test: `forge test --match-path test/solidity/Security/DexManagerFacetZero.t.sol`
@@ -356,6 +361,25 @@
 - Severity: High
 - Test: `forge test --match-path test/solidity/Security/MayanFacetAllowance.t.sol`
 - Result: `startBridgeTokensViaMayan` leaves an unlimited allowance to the Mayan router, enabling token drain via `transferFrom` if the router is compromised.
+## PeripheryRegistryFacet registers zero address
+- Severity: Medium
+- Test: `forge test --match-path test/solidity/Security/PeripheryRegistryFacetZero.t.sol`
+- Result: `registerPeripheryContract` accepts `address(0)` and stores it, enabling misconfiguration of registry entries.
+
+## Permit2Proxy unlimited token allowance to diamond
+- Severity: High
+- Test: `forge test --match-path test/solidity/Security/Permit2ProxyAllowance.t.sol`
+- Result: After execution, `Permit2Proxy` grants unlimited ERC20 allowance to the diamond, allowing a compromised diamond to drain any tokens subsequently held by the proxy.
+
+## AllBridgeFacet unlimited token allowance to router
+- Severity: High
+- Test: `forge test --match-path test/solidity/Security/AllBridgeFacetAllowance.t.sol`
+- Result: `startBridgeTokensViaAllBridge` leaves an unlimited allowance to the AllBridge router, enabling token drain via `transferFrom` if the router is compromised.
+
+## SquidFacet unlimited token allowance to router
+- Severity: High
+- Test: `forge test --match-path test/solidity/Security/SquidFacetAllowance.t.sol`
+- Result: `startBridgeTokensViaSquid` leaves an unlimited allowance to the Squid router, enabling token drain via `transferFrom` if the router is compromised.
 
 ## StargateFacetV2 unlimited token allowance to router
 - Severity: High
