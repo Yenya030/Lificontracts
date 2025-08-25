@@ -331,6 +331,11 @@
 - Test: `forge test --match-path test/solidity/Security/GenericSwapFacetV3Reentrancy.t.sol`
 - Result: Malicious DEX reenters swap to transfer entire contract token balance to attacker before outer call completes.
 
+## GenericSwapFacetV3 unlimited token allowance to DEX
+- Severity: High
+- Test: `forge test --match-path test/solidity/Security/GenericSwapFacetV3Allowance.t.sol`
+- Result: `swapTokensSingleV3ERC20ToERC20` leaves an unlimited allowance to the approved DEX, allowing it to drain any tokens later sent to the facet.
+
 ## DexManagerFacet rejects zero DEX address
 - Severity: Medium
 - Test: `forge test --match-path test/solidity/Security/DexManagerFacetZero.t.sol`
