@@ -356,3 +356,7 @@
 - Severity: High
 - Test: `forge test --match-path test/solidity/Security/MayanFacetAllowance.t.sol`
 - Result: `startBridgeTokensViaMayan` leaves an unlimited allowance to the Mayan router, enabling token drain via `transferFrom` if the router is compromised.
+## SquidFacet unlimited token allowance to router
+- Severity: High
+- Test: `forge test --match-path test/solidity/Security/SquidFacetAllowance.t.sol`
+- Result: `startBridgeTokensViaSquid` leaves an unlimited allowance to the Squid router, enabling token drain via `transferFrom` if the router is compromised.
