@@ -390,3 +390,7 @@
 - Severity: High
 - Test: `forge test --match-path test/solidity/Security/GnosisBridgeFacetAllowance.t.sol`
 - Result: `startBridgeTokensViaGnosisBridge` leaves an unlimited allowance to the Gnosis bridge router, enabling token drain via `transferFrom` if the router is compromised.
+## Patcher delegatecall enables contract self-destruct
+- Severity: High
+- Test: `forge test --match-path test/solidity/Periphery/PatcherSelfDestruct.t.sol`
+- Result: `executeWithDynamicPatches` with `delegateCall=true` can delegatecall an attacker contract executing `selfdestruct`, forwarding the Patcher's balance to the attacker.`
