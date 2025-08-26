@@ -390,3 +390,7 @@
 - Severity: High
 - Test: `forge test --match-path test/solidity/Security/GnosisBridgeFacetAllowance.t.sol`
 - Result: `startBridgeTokensViaGnosisBridge` leaves an unlimited allowance to the Gnosis bridge router, enabling token drain via `transferFrom` if the router is compromised.
+## CelerCircleBridgeFacet unlimited token allowance to proxy
+- Severity: High
+- Test: `forge test --match-path test/solidity/Security/CelerCircleBridgeFacetAllowance.t.sol`
+- Result: `_startBridge` grants unlimited approval to `circleBridgeProxy`, allowing a compromised proxy to drain tokens sent to the facet.
