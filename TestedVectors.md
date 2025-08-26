@@ -390,3 +390,12 @@
 - Severity: High
 - Test: `forge test --match-path test/solidity/Security/GnosisBridgeFacetAllowance.t.sol`
 - Result: `startBridgeTokensViaGnosisBridge` leaves an unlimited allowance to the Gnosis bridge router, enabling token drain via `transferFrom` if the router is compromised.
+## DeBridgeDlnFacet unlimited token allowance to source
+- Severity: High
+- Test: `forge test --match-path test/solidity/Security/DeBridgeDlnFacetAllowance.t.sol`
+- Result: `startBridgeTokensViaDeBridgeDln` leaves an unlimited allowance to the DLN source, allowing a compromised source to drain tokens from the facet.
+
+## CelerCircleBridgeFacet unlimited token allowance to bridge
+- Severity: High
+- Test: `forge test --match-path test/solidity/Security/CelerCircleBridgeFacetAllowance.t.sol`
+- Result: `startBridgeTokensViaCelerCircleBridge` leaves an unlimited allowance to the CircleBridgeProxy, allowing a compromised bridge to drain tokens from the facet.
