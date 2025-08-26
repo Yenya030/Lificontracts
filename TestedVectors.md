@@ -184,6 +184,7 @@
 - Test: `forge test --match-path test/solidity/Security/CelerCircleBridgeFacetZero.t.sol`
 - Result: Contract deploys with zero `circleBridgeProxy` and `usdc` addresses; calls to `startBridgeTokensViaCelerCircleBridge` succeed but leave tokens stuck in the contract.
 
+
 ## OptimismBridgeFacet initialization allows zero standard bridge
 - Severity: Medium
 - Test: `forge test --match-path test/solidity/Security/OptimismBridgeFacetZeroStandardBridge.t.sol`
@@ -390,3 +391,9 @@
 - Severity: High
 - Test: `forge test --match-path test/solidity/Security/GnosisBridgeFacetAllowance.t.sol`
 - Result: `startBridgeTokensViaGnosisBridge` leaves an unlimited allowance to the Gnosis bridge router, enabling token drain via `transferFrom` if the router is compromised.
+
+## OptimismBridgeFacet unlimited token allowance to bridge
+- Severity: High
+- Test: `forge test --match-path test/solidity/Security/OptimismBridgeFacetAllowance.t.sol`
+- Result: `startBridgeTokensViaOptimismBridge` leaves an unlimited allowance to the Optimism standard bridge, enabling token drain via `transferFrom` if the bridge is compromised.
+
