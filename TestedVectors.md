@@ -399,3 +399,8 @@
 - Severity: High
 - Test: `forge test --match-path test/solidity/Security/OmniBridgeFacetAllowance.t.sol`
 - Result: `startBridgeTokensViaOmniBridge` leaves an unlimited allowance to the foreign OmniBridge contract, allowing a compromised bridge to drain any tokens later sent to the facet.
+
+## Patcher delegatecall enables contract self-destruct
+- Severity: High
+- Test: `forge test --match-path test/solidity/Periphery/PatcherSelfDestruct.t.sol`
+- Result: `executeWithDynamicPatches` with `delegateCall=true` can delegatecall an attacker contract executing `selfdestruct`, forwarding the Patcher's balance to the attacker.`
