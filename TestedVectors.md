@@ -1,6 +1,7 @@
 
 
 
+
 # Tested Vectors
 
 ## Patcher Deposit Token Theft
@@ -404,3 +405,14 @@
 - Severity: High
 - Test: `forge test --match-path test/solidity/Periphery/PatcherSelfDestruct.t.sol`
 - Result: `executeWithDynamicPatches` with `delegateCall=true` can delegatecall an attacker contract executing `selfdestruct`, forwarding the Patcher's balance to the attacker.`
+
+
+## DeBridgeDlnFacet unlimited token allowance to source
+- Severity: High
+- Test: `forge test --match-path test/solidity/Security/DeBridgeDlnFacetAllowance.t.sol`
+- Result: `startBridgeTokensViaDeBridgeDln` leaves an unlimited allowance to the DLN source, allowing a compromised source to drain tokens from the facet.
+
+## CelerCircleBridgeFacet unlimited token allowance to bridge
+- Severity: High
+- Test: `forge test --match-path test/solidity/Security/CelerCircleBridgeFacetAllowance.t.sol`
+- Result: `startBridgeTokensViaCelerCircleBridge` leaves an unlimited allowance to the CircleBridgeProxy, allowing a compromised bridge to drain tokens from the facet.

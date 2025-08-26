@@ -3,25 +3,33 @@ pragma solidity ^0.8.17;
 
 import {Test} from "forge-std/Test.sol";
 import {MockERC20} from "solmate/test/utils/mocks/MockERC20.sol";
-import {CelerCircleBridgeFacet} from "lifi/Facets/CelerCircleBridgeFacet.sol";
-import {ICircleBridgeProxy} from "lifi/Interfaces/ICircleBridgeProxy.sol";
+import {DeBridgeDlnFacet} from "lifi/Facets/DeBridgeDlnFacet.sol";
+import {IDlnSource} from "lifi/Interfaces/IDlnSource.sol";
 import {ILiFi} from "lifi/Interfaces/ILiFi.sol";
 
-contract MockCircleBridgeProxy is ICircleBridgeProxy {
+contract MockDLNSource is IDlnSource {
     address public token;
 
     constructor(address _token) {
         token = _token;
     }
 
-    function depositForBurn(
-        uint256 _amount,
-        uint64,
-        bytes32,
-        address
-    ) external override returns (uint64) {
-        MockERC20(token).transferFrom(msg.sender, address(this), _amount);
+    function globalFixedNativeFee() external pure returns (uint256) {
         return 0;
+    }
+
+    function createOrder(
+        OrderCreation calldata _orderCreation,
+        bytes calldata,
+        uint32,
+        bytes calldata
+    ) external payable returns (bytes32 orderId) {
+        MockERC20(token).transferFrom(
+            msg.sender,
+            address(this),
+            _orderCreation.giveAmount
+        );
+        return bytes32("order");
     }
 
     // malicious drain function exploiting leftover allowance
@@ -30,22 +38,24 @@ contract MockCircleBridgeProxy is ICircleBridgeProxy {
     }
 }
 
-contract CelerCircleBridgeFacetAllowanceTest is Test {
+contract DeBridgeDlnFacetAllowanceTest is Test {
     MockERC20 internal token;
-    MockCircleBridgeProxy internal bridge;
-    CelerCircleBridgeFacet internal facet;
+    MockDLNSource internal bridge;
+    DeBridgeDlnFacet internal facet;
     address internal attacker = address(0xbeef);
 
     function setUp() public {
         token = new MockERC20("Mock", "MOCK", 18);
-        bridge = new MockCircleBridgeProxy(address(token));
-        facet = new CelerCircleBridgeFacet(
-            ICircleBridgeProxy(address(bridge)),
-            address(token)
-        );
+        bridge = new MockDLNSource(address(token));
+        facet = new DeBridgeDlnFacet(IDlnSource(address(bridge)));
 
         token.mint(address(this), 100 ether);
         token.approve(address(facet), type(uint256).max);
+
+        // map destination chain id to deBridge chain id to avoid reverts
+        bytes32 ns = keccak256("com.lifi.facets.debridgedln");
+        bytes32 slot = keccak256(abi.encode(uint256(1), ns));
+        vm.store(address(facet), slot, bytes32(uint256(1)));
     }
 
     function test_UnlimitedAllowanceAllowsTokenDrain() public {
@@ -62,7 +72,14 @@ contract CelerCircleBridgeFacetAllowanceTest is Test {
             hasDestinationCall: false
         });
 
-        facet.startBridgeTokensViaCelerCircleBridge(bridgeData);
+        DeBridgeDlnFacet.DeBridgeDlnData memory dlnData = DeBridgeDlnFacet.DeBridgeDlnData({
+            receivingAssetId: abi.encodePacked(address(token)),
+            receiver: abi.encodePacked(address(0x1234)),
+            orderAuthorityDst: bytes(""),
+            minAmountOut: 10 ether
+        });
+
+        facet.startBridgeTokensViaDeBridgeDln{value:0}(bridgeData, dlnData);
 
         // allowance remains set after bridging
         assertEq(
@@ -77,3 +94,4 @@ contract CelerCircleBridgeFacetAllowanceTest is Test {
         assertEq(token.balanceOf(attacker), 5 ether);
     }
 }
+
