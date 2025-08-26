@@ -189,6 +189,11 @@
 - Test: `forge test --match-path test/solidity/Security/OptimismBridgeFacetZeroStandardBridge.t.sol`
 - Result: `initOptimism` accepts `standardBridge` as address(0); subsequent bridge attempts revert with "call to non-contract address", leaving the facet unusable.
 
+## OptimismBridgeFacet unlimited token allowance to bridge
+- Severity: High
+- Test: `forge test --match-path test/solidity/Security/OptimismBridgeFacetAllowance.t.sol`
+- Result: `startBridgeTokensViaOptimismBridge` leaves an unlimited allowance to the Optimism bridge, allowing a malicious bridge to drain tokens via `transferFrom`.
+
 ## ThorSwapFacet constructor allows zero router address
 - Severity: Medium
 - Test: `forge test --match-path test/solidity/Security/ThorSwapFacetZero.t.sol`
@@ -241,6 +246,11 @@
 - Severity: Medium
 - Test: `forge test --match-path test/solidity/Security/OmniBridgeFacetZero.t.sol`
 - Result: Contract deploys with zero `foreignOmniBridge` and `wethOmniBridge`, rendering bridging calls unusable as they revert.
+
+## OmniBridgeFacet unlimited token allowance to bridge
+- Severity: High
+- Test: `forge test --match-path test/solidity/Security/OmniBridgeFacetAllowance.t.sol`
+- Result: `startBridgeTokensViaOmniBridge` leaves an unlimited allowance to the OmniBridge, allowing a malicious bridge to drain tokens via `transferFrom`.
 
 ## GnosisBridgeFacet constructor rejects zero router address
 - Severity: Medium
