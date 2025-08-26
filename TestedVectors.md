@@ -416,3 +416,8 @@
 - Severity: High
 - Test: `forge test --match-path test/solidity/Security/CelerCircleBridgeFacetAllowance.t.sol`
 - Result: `startBridgeTokensViaCelerCircleBridge` leaves an unlimited allowance to the CircleBridgeProxy, allowing a compromised bridge to drain tokens from the facet.
+
+## OptimismBridgeFacet unlimited token allowance to bridge
+- Severity: High
+- Test: `forge test --match-path test/solidity/Security/OptimismBridgeFacetAllowance.t.sol`
+- Result: `startBridgeTokensViaOptimismBridge` leaves an unlimited allowance to the Optimism standard bridge, enabling token drain via `transferFrom` if the bridge is compromised.
