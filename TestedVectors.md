@@ -390,3 +390,7 @@
 - Severity: High
 - Test: `forge test --match-path test/solidity/Security/GnosisBridgeFacetAllowance.t.sol`
 - Result: `startBridgeTokensViaGnosisBridge` leaves an unlimited allowance to the Gnosis bridge router, enabling token drain via `transferFrom` if the router is compromised.
+## OmniBridgeFacet unlimited token allowance to bridge
+- Severity: High
+- Test: `forge test --match-path test/solidity/Security/OmniBridgeFacetAllowance.t.sol`
+- Result: `startBridgeTokensViaOmniBridge` leaves an unlimited allowance to the foreign OmniBridge contract, allowing a compromised bridge to drain any tokens later sent to the facet.
