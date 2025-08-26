@@ -394,3 +394,8 @@
 - Severity: High
 - Test: `forge test --match-path test/solidity/Security/CelerCircleBridgeFacetAllowance.t.sol`
 - Result: `_startBridge` grants unlimited approval to `circleBridgeProxy`, allowing a compromised proxy to drain tokens sent to the facet.
+
+## OmniBridgeFacet unlimited token allowance to bridge
+- Severity: High
+- Test: `forge test --match-path test/solidity/Security/OmniBridgeFacetAllowance.t.sol`
+- Result: `startBridgeTokensViaOmniBridge` leaves an unlimited allowance to the foreign OmniBridge contract, allowing a compromised bridge to drain any tokens later sent to the facet.
