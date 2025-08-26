@@ -34,6 +34,11 @@
 - Test: `forge test --match-path test/solidity/Security/LidoWrapperSweep.t.sol`
 - Result: `wrapStETHToWstETH` unwraps entire contract balance, letting callers steal stray stETH deposits.
 
+## LidoWrapper unlimited wstETH allowance to stETH
+- Severity: High
+- Test: `forge test --match-path test/solidity/Security/LidoWrapperAllowance.t.sol`
+- Result: Constructor grants unlimited wstETH allowance to the stETH contract, enabling a malicious stETH to drain stray wstETH tokens.
+
 | Date | Description | Severity | Result |
 |------|-------------|----------|--------|
 | 2025-02-14 | Unauthorized PancakeV3 swap callback invocation | High | Reverted with `UniswapV3SwapCallbackUnknownSource` |
