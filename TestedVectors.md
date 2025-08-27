@@ -116,6 +116,11 @@
 - Test: `forge test --match-path test/solidity/Security/GasZipPeripheryZero.t.sol`
 - Result: Contract deploys with zero `gasZipRouter` and `liFiDEXAggregator`, leaving operations unusable and risking fund lockup.
 
+## GasZipFacet constructor rejects zero router address
+- Severity: Medium
+- Test: `forge test --match-path test/solidity/Security/GasZipFacetZero.t.sol`
+- Result: Constructor reverts with `InvalidConfig` when `gasZipRouter` is the zero address, preventing misconfiguration.
+
 ## RelayFacet startBridgeTokensViaRelay reentrancy
 - Severity: High
 - Test: `forge test --match-path test/solidity/Security/RelayFacetReentrancyStart.t.sol`
