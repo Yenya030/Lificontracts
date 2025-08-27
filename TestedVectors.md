@@ -368,6 +368,11 @@
 - Test: `forge test --match-path test/solidity/Security/CBridgeFacetAllowance.t.sol`
 - Result: CBridgeFacet leaves an unlimited allowance to the bridge contract after bridging, enabling token drain if the bridge is compromised.
 
+## CBridgeFacetPacked unlimited token allowance to bridge
+- Severity: High
+- Test: `forge test --match-path test/solidity/Security/CBridgeFacetPackedAllowance.t.sol`
+- Result: `setApprovalForBridge` leaves an unlimited allowance to the cBridge router, allowing a compromised bridge to drain tokens sent to the facet.
+
 ## ChainflipFacet unlimited token allowance to vault
 - Severity: High
 - Test: `forge test --match-path test/solidity/Security/ChainflipFacetAllowance.t.sol`
