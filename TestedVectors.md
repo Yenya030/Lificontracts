@@ -476,3 +476,8 @@
 - Severity: Medium
 - Test: `forge test --match-path test/solidity/Security/ReceiverStargateV2ZeroReceiver.t.sol`
 - Result: `lzCompose` transfers tokens to `address(0)` when receiver is unset, permanently burning the bridged assets.
+
+## WithdrawablePeriphery zero receiver burns funds
+- Severity: None (owner-only)
+- Tool: `slither src/Periphery/ReceiverChainflip.sol`
+- Result: `withdrawToken` lacks validation for the `receiver` address, enabling the owner to inadvertently send funds to `address(0)`. Function is restricted to `onlyOwner`, so no external exploit exists.
