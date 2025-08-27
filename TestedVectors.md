@@ -268,6 +268,11 @@
 - Test: `forge test --match-path test/solidity/Security/HopFacetPackedZero.t.sol`
 - Result: Contract deploys with zero owner and Hop wrapper, leaving bridging addresses unset and potentially causing bridge calls to fail.
 
+## HopFacetPacked unlimited token allowance to bridge
+- Severity: High
+- Test: `forge test --match-path test/solidity/Security/HopFacetPackedAllowance.t.sol`
+- Result: `setApprovalForHopBridges` leaves an unlimited allowance to the Hop bridge, enabling token drain via `transferFrom` if the bridge is compromised.
+
 
 ## DeBridgeDlnFacet constructor rejects zero DLN source address
 - Severity: Medium
