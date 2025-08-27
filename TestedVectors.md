@@ -486,3 +486,8 @@
 - Severity: None (owner-only)
 - Tool: `slither src/Periphery/ReceiverChainflip.sol`
 - Result: `withdrawToken` lacks validation for the `receiver` address, enabling the owner to inadvertently send funds to `address(0)`. Function is restricted to `onlyOwner`, so no external exploit exists.
+
+## CBridgeFacetPacked unlimited token allowance to bridge
+- Severity: High
+- Test: `forge test --match-path test/solidity/Security/CBridgeFacetPackedAllowance.t.sol`
+- Result: `setApprovalForBridge` grants unlimited token allowance to the cBridge contract, allowing a compromised bridge to drain any tokens held by the facet.
