@@ -127,6 +127,11 @@
 - Test: `forge test --match-path test/solidity/Security/GasZipFacetZero.t.sol`
 - Result: Constructor reverts with `InvalidConfig` when `gasZipRouter` is the zero address, preventing misconfiguration.
 
+## GasZipFacet zero receiver burns funds
+- Severity: Medium
+- Test: `forge test --match-path test/solidity/Facets/GasZipFacet.t.sol --match-test testBase_Revert_BridgeWithInvalidReceiverAddress`
+- Result: Reverts with `InvalidCallData` when `receiverAddress` is zero, preventing accidental burning of bridged assets.
+
 ## RelayFacet startBridgeTokensViaRelay reentrancy
 - Severity: High
 - Test: `forge test --match-path test/solidity/Security/RelayFacetReentrancyStart.t.sol`
