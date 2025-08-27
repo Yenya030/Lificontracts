@@ -2,6 +2,7 @@
 
 
 
+
 # Tested Vectors
 
 ## Patcher Deposit Token Theft
@@ -38,6 +39,11 @@
 - Severity: High
 - Test: `forge test --match-path test/solidity/Security/LidoWrapperAllowance.t.sol`
 - Result: Constructor grants unlimited wstETH allowance to the stETH contract, enabling a malicious stETH to drain stray wstETH tokens.
+
+## LidoWrapper wrap silently fails on `transferFrom`
+- Severity: Medium
+- Test: `forge test --match-path test/solidity/Security/LidoWrapperReturnFalse.t.sol`
+- Result: `wrapStETHToWstETH` does not revert when `transferFrom` returns false, minting zero tokens and masking failure.
 
 | Date | Description | Severity | Result |
 |------|-------------|----------|--------|
@@ -377,6 +383,11 @@
 - Test: `forge test --match-path test/solidity/Security/Permit2ProxyAllowance.t.sol`
 - Result: After execution, `Permit2Proxy` grants unlimited ERC20 allowance to the diamond, allowing a compromised diamond to drain any tokens subsequently held by the proxy.
 
+## Permit2Proxy constructor allows zero addresses
+- Severity: Medium
+- Test: `forge test --match-path test/solidity/Security/Permit2ProxyZero.t.sol`
+- Result: Contract deploys with zero `LIFI_DIAMOND` and Permit2 addresses, leaving the proxy misconfigured and unable to forward tokens.
+
 ## AllBridgeFacet unlimited token allowance to router
 - Severity: High
 - Test: `forge test --match-path test/solidity/Security/AllBridgeFacetAllowance.t.sol`
@@ -426,6 +437,21 @@
 - Severity: High
 - Test: `forge test --match-path test/solidity/Security/OptimismBridgeFacetAllowance.t.sol`
 - Result: `startBridgeTokensViaOptimismBridge` leaves an unlimited allowance to the Optimism standard bridge, enabling token drain via `transferFrom` if the bridge is compromised.
+## ArbitrumBridgeFacet unlimited token allowance to gateway
+- Severity: High
+- Test: `forge test --match-path test/solidity/Security/ArbitrumBridgeFacetAllowance.t.sol`
+- Result: `startBridgeTokensViaArbitrumBridge` leaves an unlimited allowance to the gateway router, allowing a compromised router to drain tokens from the facet.
+
+## AccessManagerFacet unauthorized access
+- Severity: High
+- Test: `forge test --match-path test/solidity/Facets/AccessManagerFacet.t.sol --match-test testRevert_FailsIfNonOwnerTriesToGrantAccess`
+- Result: Non-owner calls to `setCanExecute` revert with `OnlyContractOwner`, preventing privilege escalation.
+
+## CalldataVerificationFacet rejects short generic swap calldata
+- Severity: Medium
+- Test: `forge test --match-path test/solidity/Facets/CalldataVerificationFacet.t.sol --match-test test_RevertsOnInvalidGenericSwapCallData`
+- Result: `extractGenericSwapParameters` reverts with `InvalidCallData` when calldata is under 484 bytes, blocking malformed swap requests.
+
 ## CalldataVerificationFacet invalid generic swap calldata
 - Severity: Medium
 - Test: `forge test --match-path test/solidity/Security/CalldataVerificationFacetInvalid.t.sol`
