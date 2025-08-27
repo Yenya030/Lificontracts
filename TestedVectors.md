@@ -476,3 +476,7 @@
 - Severity: Medium
 - Test: `forge test --match-path test/solidity/Security/ReceiverStargateV2ZeroReceiver.t.sol`
 - Result: `lzCompose` transfers tokens to `address(0)` when receiver is unset, permanently burning the bridged assets.
+## AcrossFacet unlimited token allowance to spoke pool
+- Severity: High
+- Test: `forge test --match-path test/solidity/Security/AcrossFacetAllowance.t.sol`
+- Result: `startBridgeTokensViaAcross` leaves an unlimited allowance to the spoke pool, enabling a compromised pool to drain any tokens later sent to the facet.
