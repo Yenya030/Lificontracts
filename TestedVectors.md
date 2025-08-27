@@ -452,6 +452,11 @@
 - Test: `forge test --match-path test/solidity/Security/ArbitrumBridgeFacetAllowance.t.sol`
 - Result: `startBridgeTokensViaArbitrumBridge` leaves an unlimited allowance to the gateway router, allowing a compromised router to drain tokens from the facet.
 
+## AcrossFacet unlimited token allowance to spoke pool
+- Severity: High
+- Test: `forge test --match-path test/solidity/Security/AcrossFacetAllowance.t.sol`
+- Result: `startBridgeTokensViaAcross` leaves an unlimited allowance to the Across spoke pool, allowing a compromised pool to drain tokens from the facet.
+
 ## AccessManagerFacet unauthorized access
 - Severity: High
 - Test: `forge test --match-path test/solidity/Facets/AccessManagerFacet.t.sol --match-test testRevert_FailsIfNonOwnerTriesToGrantAccess`
