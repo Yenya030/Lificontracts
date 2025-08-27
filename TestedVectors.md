@@ -2,6 +2,7 @@
 
 
 
+
 # Tested Vectors
 
 ## Patcher Deposit Token Theft
@@ -38,6 +39,11 @@
 - Severity: High
 - Test: `forge test --match-path test/solidity/Security/LidoWrapperAllowance.t.sol`
 - Result: Constructor grants unlimited wstETH allowance to the stETH contract, enabling a malicious stETH to drain stray wstETH tokens.
+
+## LidoWrapper wrap silently fails on `transferFrom`
+- Severity: Medium
+- Test: `forge test --match-path test/solidity/Security/LidoWrapperReturnFalse.t.sol`
+- Result: `wrapStETHToWstETH` does not revert when `transferFrom` returns false, minting zero tokens and masking failure.
 
 | Date | Description | Severity | Result |
 |------|-------------|----------|--------|
@@ -426,6 +432,11 @@
 - Severity: High
 - Test: `forge test --match-path test/solidity/Security/OptimismBridgeFacetAllowance.t.sol`
 - Result: `startBridgeTokensViaOptimismBridge` leaves an unlimited allowance to the Optimism standard bridge, enabling token drain via `transferFrom` if the bridge is compromised.
+## ArbitrumBridgeFacet unlimited token allowance to gateway
+- Severity: High
+- Test: `forge test --match-path test/solidity/Security/ArbitrumBridgeFacetAllowance.t.sol`
+- Result: `startBridgeTokensViaArbitrumBridge` leaves an unlimited allowance to the gateway router, allowing a compromised router to drain tokens from the facet.
+
 ## AccessManagerFacet unauthorized access
 - Severity: High
 - Test: `forge test --match-path test/solidity/Facets/AccessManagerFacet.t.sol --match-test testRevert_FailsIfNonOwnerTriesToGrantAccess`
@@ -435,4 +446,3 @@
 - Severity: Medium
 - Test: `forge test --match-path test/solidity/Facets/CalldataVerificationFacet.t.sol --match-test test_RevertsOnInvalidGenericSwapCallData`
 - Result: `extractGenericSwapParameters` reverts with `InvalidCallData` when calldata is under 484 bytes, blocking malformed swap requests.
-
