@@ -496,3 +496,8 @@
 - Severity: High
 - Test: `forge test --match-path test/solidity/Security/CBridgeFacetPackedAllowance.t.sol`
 - Result: `setApprovalForBridge` grants unlimited token allowance to the cBridge contract, allowing a compromised bridge to drain any tokens held by the facet.
+
+## FeeCollector reentrancy during native fee collection
+- Severity: High
+- Test: `forge test --match-path test/solidity/Security/FeeCollectorReentrancy.t.sol`
+- Result: Reentrancy during `collectNativeFees` fails to drain LiFi fees; integrator fees are withdrawn but LiFi balances remain safe.
