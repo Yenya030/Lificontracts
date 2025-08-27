@@ -426,3 +426,7 @@
 - Severity: High
 - Test: `forge test --match-path test/solidity/Security/OptimismBridgeFacetAllowance.t.sol`
 - Result: `startBridgeTokensViaOptimismBridge` leaves an unlimited allowance to the Optimism standard bridge, enabling token drain via `transferFrom` if the bridge is compromised.
+## ArbitrumBridgeFacet unlimited token allowance to gateway
+- Severity: High
+- Test: `forge test --match-path test/solidity/Security/ArbitrumBridgeFacetAllowance.t.sol`
+- Result: `startBridgeTokensViaArbitrumBridge` leaves an unlimited allowance to the gateway router, allowing a compromised router to drain tokens from the facet.
