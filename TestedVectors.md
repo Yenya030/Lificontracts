@@ -466,3 +466,8 @@
 - Severity: Medium
 - Test: `forge test --match-path test/solidity/Security/ReceiverChainflipConstructor.t.sol`
 - Result: Reverted with `InvalidConfig` when any constructor parameter is zero, disallowing deployment with zero addresses.
+
+## ReceiverStargateV2 zero receiver burns funds
+- Severity: Medium
+- Test: `forge test --match-path test/solidity/Security/ReceiverStargateV2ZeroReceiver.t.sol`
+- Result: `lzCompose` transfers tokens to `address(0)` when receiver is unset, permanently burning the bridged assets.
