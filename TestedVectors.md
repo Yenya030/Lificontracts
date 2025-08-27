@@ -426,3 +426,13 @@
 - Severity: High
 - Test: `forge test --match-path test/solidity/Security/OptimismBridgeFacetAllowance.t.sol`
 - Result: `startBridgeTokensViaOptimismBridge` leaves an unlimited allowance to the Optimism standard bridge, enabling token drain via `transferFrom` if the bridge is compromised.
+## AccessManagerFacet unauthorized access
+- Severity: High
+- Test: `forge test --match-path test/solidity/Facets/AccessManagerFacet.t.sol --match-test testRevert_FailsIfNonOwnerTriesToGrantAccess`
+- Result: Non-owner calls to `setCanExecute` revert with `OnlyContractOwner`, preventing privilege escalation.
+
+## CalldataVerificationFacet rejects short generic swap calldata
+- Severity: Medium
+- Test: `forge test --match-path test/solidity/Facets/CalldataVerificationFacet.t.sol --match-test test_RevertsOnInvalidGenericSwapCallData`
+- Result: `extractGenericSwapParameters` reverts with `InvalidCallData` when calldata is under 484 bytes, blocking malformed swap requests.
+
