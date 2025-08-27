@@ -2,6 +2,7 @@
 
 
 
+
 # Tested Vectors
 
 ## Patcher Deposit Token Theft
@@ -435,3 +436,13 @@
 - Severity: High
 - Test: `forge test --match-path test/solidity/Security/ArbitrumBridgeFacetAllowance.t.sol`
 - Result: `startBridgeTokensViaArbitrumBridge` leaves an unlimited allowance to the gateway router, allowing a compromised router to drain tokens from the facet.
+
+## AccessManagerFacet unauthorized access
+- Severity: High
+- Test: `forge test --match-path test/solidity/Facets/AccessManagerFacet.t.sol --match-test testRevert_FailsIfNonOwnerTriesToGrantAccess`
+- Result: Non-owner calls to `setCanExecute` revert with `OnlyContractOwner`, preventing privilege escalation.
+
+## CalldataVerificationFacet rejects short generic swap calldata
+- Severity: Medium
+- Test: `forge test --match-path test/solidity/Facets/CalldataVerificationFacet.t.sol --match-test test_RevertsOnInvalidGenericSwapCallData`
+- Result: `extractGenericSwapParameters` reverts with `InvalidCallData` when calldata is under 484 bytes, blocking malformed swap requests.
