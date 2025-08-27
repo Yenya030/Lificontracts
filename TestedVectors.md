@@ -127,6 +127,11 @@
 - Test: `forge test --match-path test/solidity/Security/GasZipFacetZero.t.sol`
 - Result: Constructor reverts with `InvalidConfig` when `gasZipRouter` is the zero address, preventing misconfiguration.
 
+## GasZipFacet zero receiver burns funds
+- Severity: Medium
+- Test: `forge test --match-path test/solidity/Facets/GasZipFacet.t.sol --match-test testBase_Revert_BridgeWithInvalidReceiverAddress`
+- Result: Reverts with `InvalidCallData` when `receiverAddress` is zero, preventing accidental burning of bridged assets.
+
 ## RelayFacet startBridgeTokensViaRelay reentrancy
 - Severity: High
 - Test: `forge test --match-path test/solidity/Security/RelayFacetReentrancyStart.t.sol`
@@ -452,6 +457,11 @@
 - Test: `forge test --match-path test/solidity/Security/ArbitrumBridgeFacetAllowance.t.sol`
 - Result: `startBridgeTokensViaArbitrumBridge` leaves an unlimited allowance to the gateway router, allowing a compromised router to drain tokens from the facet.
 
+## AcrossFacet unlimited token allowance to spoke pool
+- Severity: High
+- Test: `forge test --match-path test/solidity/Security/AcrossFacetAllowance.t.sol`
+- Result: `startBridgeTokensViaAcross` leaves an unlimited allowance to the Across spoke pool, allowing a compromised pool to drain tokens from the facet.
+
 ## AccessManagerFacet unauthorized access
 - Severity: High
 - Test: `forge test --match-path test/solidity/Facets/AccessManagerFacet.t.sol --match-test testRevert_FailsIfNonOwnerTriesToGrantAccess`
@@ -476,6 +486,16 @@
 - Severity: Medium
 - Test: `forge test --match-path test/solidity/Security/ReceiverStargateV2ZeroReceiver.t.sol`
 - Result: `lzCompose` transfers tokens to `address(0)` when receiver is unset, permanently burning the bridged assets.
+
+## WithdrawablePeriphery zero receiver burns funds
+- Severity: None (owner-only)
+- Tool: `slither src/Periphery/ReceiverChainflip.sol`
+- Result: `withdrawToken` lacks validation for the `receiver` address, enabling the owner to inadvertently send funds to `address(0)`. Function is restricted to `onlyOwner`, so no external exploit exists.
+
+## CBridgeFacetPacked unlimited token allowance to bridge
+- Severity: High
+- Test: `forge test --match-path test/solidity/Security/CBridgeFacetPackedAllowance.t.sol`
+- Result: `setApprovalForBridge` grants unlimited token allowance to the cBridge contract, allowing a compromised bridge to drain any tokens held by the facet.
 
 ## FeeCollector reentrancy during native fee collection
 - Severity: High
