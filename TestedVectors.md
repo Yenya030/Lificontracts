@@ -476,3 +476,8 @@
 - Severity: Medium
 - Test: `forge test --match-path test/solidity/Security/ReceiverStargateV2ZeroReceiver.t.sol`
 - Result: `lzCompose` transfers tokens to `address(0)` when receiver is unset, permanently burning the bridged assets.
+
+## FeeCollector reentrancy during native fee collection
+- Severity: High
+- Test: `forge test --match-path test/solidity/Security/FeeCollectorReentrancy.t.sol`
+- Result: Reentrancy during `collectNativeFees` fails to drain LiFi fees; integrator fees are withdrawn but LiFi balances remain safe.
