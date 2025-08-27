@@ -476,3 +476,7 @@
 - Severity: Medium
 - Test: `forge test --match-path test/solidity/Security/ReceiverStargateV2ZeroReceiver.t.sol`
 - Result: `lzCompose` transfers tokens to `address(0)` when receiver is unset, permanently burning the bridged assets.
+## CBridgeFacetPacked unlimited token allowance to bridge
+- Severity: High
+- Test: `forge test --match-path test/solidity/Security/CBridgeFacetPackedAllowance.t.sol`
+- Result: `setApprovalForBridge` grants unlimited token allowance to the cBridge contract, allowing a compromised bridge to drain any tokens held by the facet.
