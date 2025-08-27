@@ -426,3 +426,12 @@
 - Severity: High
 - Test: `forge test --match-path test/solidity/Security/OptimismBridgeFacetAllowance.t.sol`
 - Result: `startBridgeTokensViaOptimismBridge` leaves an unlimited allowance to the Optimism standard bridge, enabling token drain via `transferFrom` if the bridge is compromised.
+## CalldataVerificationFacet invalid generic swap calldata
+- Severity: Medium
+- Test: `forge test --match-path test/solidity/Security/CalldataVerificationFacetInvalid.t.sol`
+- Result: Reverted with `InvalidCallData`, preventing processing of malformed generic swap calldata.
+
+## ReceiverChainflip constructor zero addresses
+- Severity: Medium
+- Test: `forge test --match-path test/solidity/Security/ReceiverChainflipConstructor.t.sol`
+- Result: Reverted with `InvalidConfig` when any constructor parameter is zero, disallowing deployment with zero addresses.
