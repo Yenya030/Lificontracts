@@ -39,6 +39,11 @@
 - Test: `forge test --match-path test/solidity/Security/LidoWrapperAllowance.t.sol`
 - Result: Constructor grants unlimited wstETH allowance to the stETH contract, enabling a malicious stETH to drain stray wstETH tokens.
 
+## LidoWrapper wrap silently fails on `transferFrom`
+- Severity: Medium
+- Test: `forge test --match-path test/solidity/Security/LidoWrapperReturnFalse.t.sol`
+- Result: `wrapStETHToWstETH` does not revert when `transferFrom` returns false, minting zero tokens and masking failure.
+
 | Date | Description | Severity | Result |
 |------|-------------|----------|--------|
 | 2025-02-14 | Unauthorized PancakeV3 swap callback invocation | High | Reverted with `UniswapV3SwapCallbackUnknownSource` |
