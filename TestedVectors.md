@@ -452,6 +452,11 @@
 - Test: `forge test --match-path test/solidity/Security/ArbitrumBridgeFacetAllowance.t.sol`
 - Result: `startBridgeTokensViaArbitrumBridge` leaves an unlimited allowance to the gateway router, allowing a compromised router to drain tokens from the facet.
 
+## AcrossFacet unlimited token allowance to spoke pool
+- Severity: High
+- Test: `forge test --match-path test/solidity/Security/AcrossFacetAllowance.t.sol`
+- Result: `startBridgeTokensViaAcross` leaves an unlimited allowance to the Across spoke pool, allowing a compromised pool to drain tokens from the facet.
+
 ## AccessManagerFacet unauthorized access
 - Severity: High
 - Test: `forge test --match-path test/solidity/Facets/AccessManagerFacet.t.sol --match-test testRevert_FailsIfNonOwnerTriesToGrantAccess`
@@ -476,6 +481,12 @@
 - Severity: Medium
 - Test: `forge test --match-path test/solidity/Security/ReceiverStargateV2ZeroReceiver.t.sol`
 - Result: `lzCompose` transfers tokens to `address(0)` when receiver is unset, permanently burning the bridged assets.
+
+## WithdrawablePeriphery zero receiver burns funds
+- Severity: None (owner-only)
+- Tool: `slither src/Periphery/ReceiverChainflip.sol`
+- Result: `withdrawToken` lacks validation for the `receiver` address, enabling the owner to inadvertently send funds to `address(0)`. Function is restricted to `onlyOwner`, so no external exploit exists.
+
 ## CBridgeFacetPacked unlimited token allowance to bridge
 - Severity: High
 - Test: `forge test --match-path test/solidity/Security/CBridgeFacetPackedAllowance.t.sol`
