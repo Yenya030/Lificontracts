@@ -451,3 +451,13 @@
 - Severity: Medium
 - Test: `forge test --match-path test/solidity/Facets/CalldataVerificationFacet.t.sol --match-test test_RevertsOnInvalidGenericSwapCallData`
 - Result: `extractGenericSwapParameters` reverts with `InvalidCallData` when calldata is under 484 bytes, blocking malformed swap requests.
+
+## CalldataVerificationFacet invalid generic swap calldata
+- Severity: Medium
+- Test: `forge test --match-path test/solidity/Security/CalldataVerificationFacetInvalid.t.sol`
+- Result: Reverted with `InvalidCallData`, preventing processing of malformed generic swap calldata.
+
+## ReceiverChainflip constructor zero addresses
+- Severity: Medium
+- Test: `forge test --match-path test/solidity/Security/ReceiverChainflipConstructor.t.sol`
+- Result: Reverted with `InvalidConfig` when any constructor parameter is zero, disallowing deployment with zero addresses.
